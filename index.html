@@ -617,8 +617,12 @@ memory: largest free block 9584 MiB of 12416 MiB, heap 1920 MiB and 96 MiB in 1 
       say: (p) => `The emulator touched an address it shouldn't${p.seconds !== null && p.seconds < 30 ? ", within seconds of starting" : ""}. Usually an emulator bug rather than your setup.`,
       tries: () => ["Try 1x and no mods to see if a setting triggers it.", "Report it with the logs from the same folder."], issues: [109] },
     { kind: "Mod", title: "UltraCam is on", test: (p) => /ultra\s*cam|nx-?optimizer/i.test(p.mods || ""),
-      say: () => "UltraCam needs more memory than the PS5 gives the emulator and makes the Zelda games crash or restart while loading.",
-      tries: () => ["Turn UltraCam off in the game's Mods settings."], issues: [151, 106] },
+      say: (p) => p.version && verCmp(p.version, "1.3.0") < 0
+        ? "UltraCam crashed or restarted the Zelda games while loading on versions before 1.003.000."
+        : "UltraCam is heavy: it rebuilds a lot of game files and needs extra memory.",
+      tries: (p) => p.version && verCmp(p.version, "1.3.0") < 0
+        ? ["Update to 1.003.000 or newer: it fixed a startup crash with UltraCam.", "Then set the game's memory to 8 GiB under Settings > Performance > Memory.", "Or turn UltraCam off in the game's Mods settings."]
+        : ["Set the game's memory to 8 GiB under Settings > Performance > Memory.", "If it still crashes, turn UltraCam off in the game's Mods settings."], issues: [151, 106] },
     { kind: "Likely factor", title: "Heavy settings", test: (p) => parseFloat(p.res) >= 2 && (p.output === "2160p" || p.hz === "120"),
       say: (p) => `${p.res}x with ${[p.output === "2160p" && "4K output", p.hz === "120" && "120 Hz"].filter(Boolean).join(" and ")} eats shared memory and GPU time.`,
       tries: () => ["Start at 1x or 1.5x, 1080p or 1440p, 60 Hz, then raise one thing at a time."], issues: [99, 207] },

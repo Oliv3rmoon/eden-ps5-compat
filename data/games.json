@@ -1,6 +1,6 @@
 {
   "updated": "2026-10-15",
-  "latest": "1.002.000",
+  "latest": "1.003.000",
   "statuses": "well | glitches | unplayable | wontstart | mods | closed",
   "games": [
     {
@@ -14,7 +14,7 @@
         64,
         151
       ],
-      "note": "Crashes at about 75% of loading with \"mutex lock failed: Cannot allocate memory\", even at default settings. A fix is proposed in pull request #210. UltraCam mods need more memory than the PS5 gives the emulator."
+      "note": "Crashes at about 75% of loading with \"mutex lock failed: Cannot allocate memory\" on 1.002.000, even with no mods and default settings; a fix is proposed in pull request #210 and not yet in a release. Separately, 1.003.000 fixed a startup crash with UltraCam (tested on TOTK 1.1.1 to the menu) and adds a per-game memory setting of up to 8 GiB for demanding mods."
     },
     {
       "name": "The Legend of Zelda: Breath of the Wild",
@@ -26,7 +26,7 @@
         53,
         209
       ],
-      "note": "Runs, with low frame rates in places. With the UltraCam mod it restarts at \"Starting the Game\". Simplified Chinese text falls back to English with ShadowMountPlus 1.7beta4."
+      "note": "Runs, with low frame rates in places. With UltraCam it restarted at \"Starting the Game\" on 1.000.100; 1.003.000 fixed a similar UltraCam crash in Tears of the Kingdom and adds up to 8 GiB of memory per game, so it's worth retrying. Simplified Chinese text fell back to English with ShadowMountPlus 1.7beta4; a fix is on the way upstream."
     },
     {
       "name": "Luigi's Mansion 3",
