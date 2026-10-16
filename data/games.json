@@ -1,0 +1,264 @@
+{
+  "updated": "2026-10-15",
+  "latest": "1.002.000",
+  "statuses": "well | glitches | unplayable | wontstart | mods | closed",
+  "games": [
+    {
+      "name": "The Legend of Zelda: Tears of the Kingdom",
+      "titleId": "0100F2C0115B6000",
+      "status": "wontstart",
+      "version": "1.002.000",
+      "issues": [
+        204,
+        86,
+        64,
+        151
+      ],
+      "note": "Crashes at about 75% of loading with \"mutex lock failed: Cannot allocate memory\", even at default settings. A fix is proposed in pull request #210. UltraCam mods need more memory than the PS5 gives the emulator."
+    },
+    {
+      "name": "The Legend of Zelda: Breath of the Wild",
+      "status": "glitches",
+      "version": "1.000.110",
+      "issues": [
+        46,
+        106,
+        53,
+        209
+      ],
+      "note": "Runs, with low frame rates in places. With the UltraCam mod it restarts at \"Starting the Game\". Simplified Chinese text falls back to English with ShadowMountPlus 1.7beta4."
+    },
+    {
+      "name": "Luigi's Mansion 3",
+      "status": "well",
+      "version": "1.001.000",
+      "issues": [
+        150,
+        93
+      ],
+      "note": "Plays well (EU, v1.4.0). An early version ran out of graphics memory at the opening scene."
+    },
+    {
+      "name": "Monster Hunter Generations Ultimate",
+      "status": "well",
+      "version": "1.001.000",
+      "issues": [
+        148
+      ],
+      "note": "Plays well (v1.5.0)."
+    },
+    {
+      "name": "Metroid Prime 4",
+      "titleId": "010019A01E2F2000",
+      "status": "unplayable",
+      "version": "1.002.000",
+      "issues": [
+        195
+      ],
+      "note": "Starts but can't be played (USA, update 1.10)."
+    },
+    {
+      "name": "Ori and the Blind Forest: Definitive Edition",
+      "titleId": "010061D00DB74800",
+      "status": "glitches",
+      "version": "1.000.110",
+      "issues": [
+        130
+      ],
+      "note": "Plays with graphics glitches."
+    },
+    {
+      "name": "The Stretchers",
+      "status": "unplayable",
+      "version": "",
+      "issues": [
+        129
+      ],
+      "note": "Crashes shortly after launch."
+    },
+    {
+      "name": "Achilles: Survivor",
+      "status": "glitches",
+      "version": "",
+      "issues": [
+        122
+      ],
+      "note": "Plays with glitches (v1.0.2)."
+    },
+    {
+      "name": "Mario Kart 8 Deluxe",
+      "status": "mods",
+      "version": "1.000.110",
+      "issues": [
+        120
+      ],
+      "note": "Crashes with the CTGDX mod (game v3.0.3). No report yet without mods."
+    },
+    {
+      "name": "Top Racer Collection",
+      "status": "glitches",
+      "version": "1.000.110",
+      "issues": [
+        119
+      ],
+      "note": "Severe slowdown during races, and a Vulkan crash."
+    },
+    {
+      "name": "Fighting Force Collection",
+      "status": "unplayable",
+      "version": "1.000.110",
+      "issues": [
+        118
+      ],
+      "note": "Crashes when launching Fighting Force 1 (Vulkan)."
+    },
+    {
+      "name": "Super Mario Galaxy and Super Mario Galaxy 2",
+      "status": "glitches",
+      "version": "1.000.110",
+      "issues": [
+        116
+      ],
+      "note": "Slowdown in busy scenes, and torn or stretched frames."
+    },
+    {
+      "name": "Pokémon Legends: Z-A",
+      "status": "unplayable",
+      "version": "",
+      "issues": [
+        112,
+        59
+      ],
+      "note": "The city does not load after the welcome screen. Objects flicker, and the picture breaks up leaving the first train station."
+    },
+    {
+      "name": "Super Mario Bros. Wonder",
+      "titleId": "010015100B514000",
+      "status": "wontstart",
+      "version": "1.000.110",
+      "issues": [
+        109
+      ],
+      "note": "Crashed 9 seconds in with an invalid memory access at 2x resolution. Try 1x and report back."
+    },
+    {
+      "name": "Just Dance 2025",
+      "status": "unplayable",
+      "version": "",
+      "issues": [
+        107
+      ],
+      "note": "Says no controller is found."
+    },
+    {
+      "name": "Paper Mario: The Thousand-Year Door",
+      "titleId": "0100ECD018EBE000",
+      "status": "glitches",
+      "version": "1.000.100",
+      "issues": [
+        99
+      ],
+      "note": "Ran out of memory after about 40 minutes at 2x, 2160p, 120 Hz. Lighter settings are worth trying."
+    },
+    {
+      "name": "Tomodachi Life",
+      "status": "glitches",
+      "version": "1.000.100",
+      "issues": [
+        84
+      ],
+      "note": "Runs at 30 FPS. Frame generation has no effect in this game."
+    },
+    {
+      "name": "The Legend of Zelda: Link's Awakening",
+      "status": "glitches",
+      "version": "1.000.080",
+      "issues": [
+        62
+      ],
+      "note": "Holds about 40 FPS at any resolution, so the limit is the CPU."
+    },
+    {
+      "name": "Hyrule Warriors: Age of Calamity",
+      "status": "glitches",
+      "version": "1.000.080",
+      "issues": [
+        61
+      ],
+      "note": "Drops to about 1 FPS for a while, then recovers. Crashes now and then."
+    },
+    {
+      "name": "Super Mario 3D All-Stars",
+      "status": "wontstart",
+      "version": "1.000.080",
+      "issues": [
+        60
+      ],
+      "note": "Stays on the loading screen after picking one of the three games; the music plays."
+    },
+    {
+      "name": "Splatoon 3",
+      "status": "wontstart",
+      "version": "1.000.080",
+      "issues": [
+        60
+      ],
+      "note": "Stays on the loading screen."
+    },
+    {
+      "name": "Xenoblade Chronicles 3",
+      "status": "wontstart",
+      "version": "1.000.080",
+      "issues": [
+        52
+      ],
+      "note": "Freezes the whole console in the opening scene or early in the first fight. Only pulling the power helps."
+    },
+    {
+      "name": "Mario Party Jamboree",
+      "status": "glitches",
+      "version": "",
+      "issues": [
+        48
+      ],
+      "note": "Freezes in the Cookie Cutter minigame (PS5 Pro)."
+    },
+    {
+      "name": "Castlevania: Belmont's Curse",
+      "status": "wontstart",
+      "version": "1.002.000",
+      "issues": [
+        206
+      ],
+      "note": "Does not start."
+    },
+    {
+      "name": "Xenoblade Chronicles 2",
+      "status": "closed",
+      "version": "",
+      "issues": [
+        58
+      ],
+      "note": "A crash entering Torigoth was reported; the issue is closed."
+    },
+    {
+      "name": "Pokémon: Let's Go, Pikachu!",
+      "status": "closed",
+      "version": "1.000.110",
+      "issues": [
+        110,
+        136
+      ],
+      "note": "Single Joy-Con controls were fixed; the issues are closed."
+    },
+    {
+      "name": "Portal 2",
+      "status": "closed",
+      "version": "",
+      "issues": [
+        134
+      ],
+      "note": "A crash a few seconds after launch (microphone input) was fixed."
+    }
+  ]
+}

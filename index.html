@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Eden PS5 Compat Log</title>
+<meta name="description" content="Unofficial community log of how Switch games run in the ProsperoEden emulator on PS5, with a crash report explainer.">
+<meta property="og:title" content="Eden PS5 Compat Log">
+<meta property="og:description" content="Which Switch games run in ProsperoEden on PS5, from public reports and players. Paste a crash report to see what it means.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://oliv3rmoon.github.io/eden-ps5-compat/">
+<link rel="canonical" href="https://oliv3rmoon.github.io/eden-ps5-compat/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='black'/%3E%3Crect x='5' y='12' width='4' height='8' fill='white'/%3E%3Crect x='11' y='12' width='4' height='8' fill='white'/%3E%3Crect x='17' y='12' width='4' height='8' fill='white'/%3E%3Crect x='23.5' y='12.5' width='3' height='7' fill='none' stroke='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Instrument+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a black-and-white arcade score sheet. Inverted masthead, thick rules, a 4-cell playability meter instead of colour. */
+:root {
+  --paper: #ffffff;
+  --ink: #000000;
+  --grey: #5c5c5c;
+  --rule: #000000;
+  --hair: #d6d6d6;
+  --wash: #f2f2f2;
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --paper: #000000; --ink: #ffffff; --grey: #a3a3a3; --rule: #ffffff; --hair: #2e2e2e; --wash: #111111; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --paper: #000000; --ink: #ffffff; --grey: #a3a3a3; --rule: #ffffff; --hair: #2e2e2e; --wash: #111111; color-scheme: dark; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body { background: var(--paper); color: var(--ink); font: 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.inner { max-width: 1080px; margin: 0 auto; }
+.mono { font-family: var(--mono); }
+.caps { font: 700 0.74rem var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
+
+/* masthead */
+.mast { background: var(--ink); color: var(--paper); padding-block: 28px 24px; }
+.mast .inner { display: grid; gap: 18px; }
+.mast-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; align-items: baseline; }
+h1 { font: 900 clamp(3rem, 11vw, 7.5rem)/0.84 var(--display); text-transform: uppercase; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h1 span { display: block; -webkit-text-stroke: 2px var(--paper); color: transparent; }
+.lede { margin: 0; max-width: 60ch; font-size: 1.05rem; }
+.scoreboard { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 2px solid var(--paper); }
+.scoreboard div { padding: 10px 12px; border-left: 2px solid var(--paper); min-width: 0; }
+.scoreboard div:first-child { border-left: 0; }
+.scoreboard b { display: block; font: 900 clamp(1.6rem, 4vw, 2.3rem)/1 var(--display); font-variant-numeric: tabular-nums; }
+.scoreboard small { font: 600 0.7rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.8; }
+.mast-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { font: 700 0.92rem var(--body); letter-spacing: 0.04em; text-transform: uppercase; padding: 11px 16px; border: 2px solid var(--ink);
+  background: var(--paper); color: var(--ink); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.btn:hover { background: var(--ink); color: var(--paper); }
+.btn.solid { background: var(--ink); color: var(--paper); }
+.btn.solid:hover { background: var(--paper); color: var(--ink); }
+.mast .btn { border-color: var(--paper); background: var(--ink); color: var(--paper); }
+.mast .btn:hover, .mast .btn.solid { background: var(--paper); color: var(--ink); }
+.mast .btn.solid:hover { background: var(--ink); color: var(--paper); }
+
+/* tabs */
+.tabbar { border-bottom: 3px solid var(--rule); position: sticky; top: env(safe-area-inset-top, 0px); background: var(--paper); z-index: 5; }
+.tabbar .inner { display: flex; gap: 0; }
+.tabbar button { font: 900 1.25rem var(--display); text-transform: uppercase; letter-spacing: 0.04em; background: none; border: 0; color: var(--grey);
+  padding: 12px 18px 10px; cursor: pointer; }
+.tabbar button[aria-selected="true"] { color: var(--paper); background: var(--ink); }
+main { padding-block: 22px 56px; }
+.panel { display: grid; gap: 18px; }
+
+/* meter: four cells, filled by how playable */
+.meter { display: inline-grid; grid-template-columns: repeat(4, 9px); gap: 3px; flex: none; }
+.meter i { height: 18px; border: 2px solid var(--ink); display: block; }
+.meter i.on { background: var(--ink); }
+.meter i.hatch { background: repeating-linear-gradient(135deg, var(--ink) 0 2px, transparent 2px 5px); }
+.meter.closed i { border-style: dashed; border-color: var(--grey); }
+.meter.small { grid-template-columns: repeat(4, 6px); gap: 2px; }
+.meter.small i { height: 12px; border-width: 1.5px; }
+
+/* filters */
+.controls { display: grid; gap: 12px; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 9px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink);
+  padding: 6px 12px 6px 9px; font: 600 0.9rem var(--body); cursor: pointer; }
+.chip .n { font-family: var(--mono); font-size: 0.82rem; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.chip[aria-pressed="true"] .meter i { border-color: var(--paper); }
+.chip[aria-pressed="true"] .meter i.on { background: var(--paper); }
+.chip[aria-pressed="true"] .meter i.hatch { background: repeating-linear-gradient(135deg, var(--paper) 0 2px, transparent 2px 5px); }
+.searchrow { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+.search { flex: 1 1 280px; min-width: 0; position: relative; }
+.search input { width: 100%; font: 1.05rem var(--body); padding: 12px 44px 12px 14px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 0; }
+.search kbd { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font: 600 0.78rem var(--mono); border: 1.5px solid var(--grey); color: var(--grey); padding: 0 6px; }
+select { font: 600 0.92rem var(--body); padding: 0 12px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 0; min-height: 48px; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font: 600 0.92rem var(--body); cursor: pointer; border: 2px solid var(--ink); padding: 0 12px; min-height: 48px; }
+.toggle input { accent-color: var(--ink); width: 18px; height: 18px; margin: 0; }
+
+/* rows */
+.list { border-top: 3px solid var(--rule); }
+.row { border-bottom: 1px solid var(--ink); }
+.row > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 14px 4px; }
+.row > summary::-webkit-details-marker { display: none; }
+.row > summary:hover { background: var(--wash); }
+.name { font: 700 1.08rem/1.25 var(--body); }
+.sub { color: var(--grey); font-size: 0.92rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row[open] .sub { white-space: normal; }
+.tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.tag { font: 600 0.74rem var(--mono); border: 1.5px solid var(--ink); padding: 1px 6px; white-space: nowrap; }
+.tag.inv { background: var(--ink); color: var(--paper); }
+.tag.dash { border-style: dashed; color: var(--grey); border-color: var(--grey); }
+.status-word { font: 900 1.05rem var(--display); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.row-body { padding: 4px 4px 20px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+@media (max-width: 760px) { .row-body { grid-template-columns: minmax(0, 1fr); } }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; margin: 0; font-size: 0.93rem; }
+.facts dt { color: var(--grey); }
+.facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.timeline { display: grid; gap: 0; border-left: 3px solid var(--ink); }
+.tl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 8px 0 8px 12px; border-bottom: 1px dashed var(--hair); }
+.tl:last-child { border-bottom: 0; }
+.tl .meta { font: 0.78rem var(--mono); color: var(--grey); }
+.tl p { margin: 2px 0 0; font-size: 0.92rem; overflow-wrap: anywhere; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.empty { color: var(--grey); font-style: italic; margin: 0; }
+.loadnote { font: 0.82rem var(--mono); color: var(--grey); }
+
+/* post form */
+.post { border: 3px solid var(--ink); padding: 18px; display: grid; gap: 14px; background: var(--paper); }
+.post h2 { font: 900 1.8rem/1 var(--display); text-transform: uppercase; margin: 0; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field label { font: 700 0.74rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; }
+.field input, .field select, .field textarea { font: 1rem var(--body); padding: 9px 10px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 0; min-width: 0; width: 100%; }
+.field textarea { min-height: 80px; resize: vertical; }
+.statuspick { display: flex; flex-wrap: wrap; gap: 8px; border: 0; padding: 0; margin: 0; }
+.statuspick legend { font: 700 0.74rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; padding: 0; }
+.statuspick label { display: inline-flex; align-items: center; gap: 8px; border: 2px solid var(--ink); padding: 7px 11px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+.statuspick input { position: absolute; opacity: 0; pointer-events: none; }
+.statuspick input:checked + label { background: var(--ink); color: var(--paper); }
+.statuspick input:checked + label .meter i { border-color: var(--paper); }
+.statuspick input:checked + label .meter i.on { background: var(--paper); }
+.statuspick input:checked + label .meter i.hatch { background: repeating-linear-gradient(135deg, var(--paper) 0 2px, transparent 2px 5px); }
+.statuspick input:focus-visible + label { outline: 3px solid var(--ink); outline-offset: 2px; }
+.formrow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.note { font-size: 0.9rem; color: var(--grey); }
+pre.copyout { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--wash); border: 1px solid var(--ink); padding: 12px; margin: 0; font: 0.82rem/1.5 var(--mono); }
+
+/* crash explainer */
+.crash-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 860px) { .crash-grid { grid-template-columns: minmax(0, 1fr); } }
+textarea#crash-input { width: 100%; min-height: 380px; font: 0.8rem/1.55 var(--mono); padding: 14px; border: 3px solid var(--ink); background: var(--ink); color: var(--paper); resize: vertical; border-radius: 0; }
+.parsed { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 3px 14px; margin: 0; border: 2px solid var(--ink); padding: 12px 14px; font-size: 0.9rem; }
+.parsed dt { font: 700 0.72rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); padding-top: 2px; }
+.parsed dd { margin: 0; font: 0.82rem var(--mono); overflow-wrap: anywhere; min-width: 0; }
+.finding { border: 2px solid var(--ink); display: grid; gap: 6px; padding: 14px; }
+.finding.hard { background: var(--ink); color: var(--paper); }
+.finding .kind { font: 700 0.72rem var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
+.finding h3 { font: 900 1.5rem/1.05 var(--display); text-transform: uppercase; margin: 0; }
+.finding p { margin: 0; }
+.finding ul { margin: 0; padding-left: 1.1em; }
+.findings { display: grid; gap: 10px; }
+h2.section { font: 900 1.6rem/1 var(--display); text-transform: uppercase; margin: 6px 0 0; }
+
+footer { border-top: 3px solid var(--rule); padding-block: 18px 32px; color: var(--grey); font-size: 0.88rem; }
+footer .inner { display: grid; gap: 6px; }
+footer p { margin: 0; max-width: 85ch; }
+@media (max-width: 600px) {
+  .scoreboard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .scoreboard div:nth-child(3) { border-left: 0; }
+  .scoreboard div:nth-child(n+3) { border-top: 2px solid var(--paper); }
+  .row > summary { grid-template-columns: auto minmax(0, 1fr); }
+  .row > summary .tags { grid-column: 1 / -1; justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn, .chip, .row > summary { transition: background-color 0.12s, color 0.12s; }
+}
+</style>
+</head>
+<body>
+<header class="mast gutter">
+  <div class="inner">
+    <div class="mast-top">
+      <span class="caps">Unofficial community log</span>
+      <span class="caps mono" id="updated"></span>
+    </div>
+    <h1>Eden PS5<span>Compat Log</span></h1>
+    <p class="lede">Which Switch games run in the ProsperoEden emulator on PS5. Statuses update from player results as they come in, and the crash explainer turns a crash report into plain English.</p>
+    <div class="scoreboard" aria-label="Totals">
+      <div><b id="sb-games">0</b><small>Games logged</small></div>
+      <div><b id="sb-playable">0</b><small>Playable</small></div>
+      <div><b id="sb-reports">0</b><small>Player results</small></div>
+      <div><b id="sb-latest">-</b><small>Latest app</small></div>
+    </div>
+    <div class="mast-actions">
+      <button class="btn solid" type="button" id="post-open">+ Post a result</button>
+      <a class="btn" href="#crash" id="crash-jump">Explain a crash</a>
+    </div>
+  </div>
+</header>
+
+<nav class="tabbar gutter" aria-label="Sections">
+  <div class="inner" role="tablist">
+    <button role="tab" id="tab-games" aria-controls="panel-games" aria-selected="true">Games</button>
+    <button role="tab" id="tab-crash" aria-controls="panel-crash" aria-selected="false">Crash explainer</button>
+  </div>
+</nav>
+
+<main class="gutter">
+  <div class="inner">
+    <section class="panel" id="panel-games" role="tabpanel" aria-labelledby="tab-games">
+      <form class="post" id="post" hidden>
+        <h2>Post a result</h2>
+        <p class="note">Fill this in and press Post on GitHub: it opens a ready-made report there. Once you submit it, your result is added to the log and the game's status updates.</p>
+        <div class="fields">
+          <div class="field"><label for="f-game">Game</label><input id="f-game" list="game-names" required maxlength="120" placeholder="Super Mario Odyssey" autocomplete="off"></div>
+          <div class="field"><label for="f-app">ProsperoEden version</label><input id="f-app" maxlength="20" placeholder="1.002.000"></div>
+          <div class="field"><label for="f-fw">PS5 system software</label><input id="f-fw" maxlength="12" placeholder="9.60"></div>
+          <div class="field"><label for="f-console">Console</label><select id="f-console"><option>PS5</option><option>PS5 Slim</option><option>PS5 Pro</option><option>PS5 Digital</option></select></div>
+        </div>
+        <fieldset class="statuspick" id="f-status"><legend>How it runs</legend></fieldset>
+        <div class="field"><label for="f-settings">Settings</label><input id="f-settings" maxlength="120" placeholder="Vulkan, 1x, FSR, 1080p, 60 Hz"></div>
+        <div class="field"><label for="f-notes">What happened</label><textarea id="f-notes" maxlength="1500" placeholder="Where it crashes, frame rate, mods, what helped. Paste a crash report if you have one."></textarea></div>
+        <div class="formrow">
+          <button class="btn solid" type="submit">Post on GitHub</button>
+          <button class="btn" type="button" id="f-copy-btn">Copy as text</button>
+          <button class="btn" type="button" id="f-cancel">Cancel</button>
+          <span class="note" id="f-msg" role="status"></span>
+        </div>
+        <pre class="copyout" id="f-copy" hidden></pre>
+      </form>
+      <datalist id="game-names"></datalist>
+
+      <div class="controls">
+        <div class="filters" id="filters" aria-label="Filter by status"></div>
+        <div class="searchrow">
+          <div class="search"><input type="search" id="q" placeholder="Search a game or title ID" aria-label="Search games"><kbd aria-hidden="true">/</kbd></div>
+          <select id="sort" aria-label="Sort">
+            <option value="status">Most playable first</option>
+            <option value="recent">Recently updated</option>
+            <option value="reports">Most results</option>
+            <option value="az">A to Z</option>
+          </select>
+          <label class="toggle"><input type="checkbox" id="only-latest"> Tested on latest</label>
+        </div>
+        <span class="loadnote" id="loadnote" role="status">Loading the log…</span>
+      </div>
+      <div class="list" id="list"></div>
+      <p class="empty" id="no-match" hidden>Nothing matches. If you've tested it, post a result.</p>
+    </section>
+
+    <section class="panel" id="panel-crash" role="tabpanel" aria-labelledby="tab-crash" hidden>
+      <p class="lede" style="max-width:70ch">Paste a crash report from <span class="mono">/data/prosperoeden/logs</span>. It's read right here in your browser and never uploaded. An example is loaded.</p>
+      <div class="crash-grid">
+        <div class="field">
+          <label for="crash-input">Crash report</label>
+          <textarea id="crash-input" spellcheck="false"></textarea>
+          <div class="formrow"><button class="btn" type="button" id="crash-clear">Clear</button><button class="btn" type="button" id="crash-example">Load example</button></div>
+        </div>
+        <div id="crash-results" aria-live="polite"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="gutter">
+  <div class="inner">
+    <p>Unofficial and community-run. Not affiliated with or endorsed by the ProsperoEden project, BlackBearReloaded, the Eden project, Sony or Nintendo. Starting statuses come from public reports in the <a href="https://github.com/blackbearreloaded/ProsperoEden/issues" target="_blank" rel="noopener">ProsperoEden issue tracker</a>; your results may differ.</p>
+    <p>Only play games you own, dumped from your own hardware. Never post game files, keys or firmware. <a href="https://github.com/Oliv3rmoon/eden-ps5-compat" target="_blank" rel="noopener">Source and results on GitHub</a>.</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+  const OWN = "Oliv3rmoon/eden-ps5-compat";
+  const UPSTREAM = "https://github.com/blackbearreloaded/ProsperoEden";
+  // Playability: 4 = plays well ... 1 = won't start. "mods" breaks only with a mod; "closed" is an issue that was resolved.
+  const S = {
+    well:       { label: "Plays well",          cells: [1, 1, 1, 1], rank: 4 },
+    glitches:   { label: "Plays with glitches", cells: [1, 1, 1, 0], rank: 3 },
+    mods:       { label: "Breaks with a mod",   cells: [1, 1, 1, 2], rank: 2.5 },
+    unplayable: { label: "Starts, can't play",  cells: [1, 1, 0, 0], rank: 2 },
+    wontstart:  { label: "Won't start",         cells: [1, 0, 0, 0], rank: 1 },
+    closed:     { label: "Issue closed",        cells: [0, 0, 0, 0], rank: 0 },
+  };
+  const ORDER = ["well", "glitches", "mods", "unplayable", "wontstart", "closed"];
+  const POSTABLE = ["well", "glitches", "unplayable", "wontstart", "mods"];
+  const BY_LABEL = Object.fromEntries(ORDER.map((k) => [S[k].label.toLowerCase(), k]));
+
+  const $ = (id) => document.getElementById(id);
+  function el(tag, props, ...kids) {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (k === "class") n.className = v;
+      else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2), v);
+      else if (v !== undefined && v !== null && v !== false) n.setAttribute(k, v === true ? "" : v);
+    }
+    for (const kid of kids.flat(Infinity)) if (kid !== null && kid !== undefined && kid !== false) n.append(kid);
+    return n;
+  }
+  const norm = (t) => String(t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+  const slug = (t) => norm(t).replace(/ /g, "-").slice(0, 60);
+  const shortVer = (v) => String(v || "").replace(/^0+(\d)/, "$1");
+  const verParts = (v) => shortVer(v).split(".").map((x) => parseInt(x, 10) || 0);
+  function verCmp(a, b) { const x = verParts(a), y = verParts(b); for (let i = 0; i < 3; i++) { const d = (x[i] || 0) - (y[i] || 0); if (d) return d; } return 0; }
+  // "2026-10-15" is a calendar date, not UTC midnight: read it in local time.
+  const dayDate = (d) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d || "")); return m ? new Date(+m[1], m[2] - 1, +m[3]).getTime() : Date.parse(d) || 0; };
+  const fmtDate = (t) => t ? new Date(t).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "";
+  function meter(status, small) {
+    const st = S[status] || S.glitches;
+    return el("span", { class: "meter" + (small ? " small" : "") + (status === "closed" ? " closed" : ""), "aria-hidden": "true" },
+      st.cells.map((c) => el("i", { class: c === 1 ? "on" : c === 2 ? "hatch" : "" })));
+  }
+
+  const state = { meta: { latest: "", updated: "" }, base: [], reports: [], filter: null, query: "", sort: "status", onlyLatest: false, open: new Set() };
+  try { const saved = JSON.parse(localStorage.getItem("ecl-prefs") || "{}"); if (saved.sort) state.sort = saved.sort; state.onlyLatest = !!saved.onlyLatest; } catch (_) {}
+  const savePrefs = () => { try { localStorage.setItem("ecl-prefs", JSON.stringify({ sort: state.sort, onlyLatest: state.onlyLatest })); } catch (_) {} };
+
+  // ---------- the model: every game is a list of results; the newest app version decides ----------
+  function matches(game, report) {
+    const g = norm(game.name), r = norm(report.game);
+    if (!r) return false;
+    if (game.titleId && report.game.toUpperCase().includes(game.titleId)) return true;
+    return r === g || (r.length >= 6 && g.includes(r)) || (g.length >= 6 && r.includes(g));
+  }
+  function buildGames() {
+    const games = state.base.map((b) => ({ name: b.name, titleId: b.titleId || "", note: b.note || "", issues: b.issues || [],
+      results: [{ status: b.status, version: b.version || "", at: dayDate(state.meta.updated), source: "issues", note: b.note || "" }] }));
+    for (const r of state.reports) {
+      let g = games.find((x) => matches(x, r));
+      if (!g) { g = { name: r.game, titleId: "", note: "", issues: [], results: [], community: true }; games.push(g); }
+      g.results.push({ status: r.status, version: r.app, at: r.at, source: "player", note: r.notes, settings: r.settings, console: r.console, fw: r.fw, by: r.by, url: r.url, verified: r.verified });
+    }
+    for (const g of games) Object.assign(g, verdict(g));
+    return games;
+  }
+  function verdict(g) {
+    const rs = g.results.slice().sort((a, b) => b.at - a.at);
+    const versions = rs.map((r) => r.version).filter(Boolean);
+    const newest = versions.reduce((m, v) => (!m || verCmp(v, m) > 0 ? v : m), "");
+    const atNewest = rs.filter((r) => (newest ? r.version === newest : true));
+    // Majority on the newest version; ties go to the most recent result. Verified results count double.
+    const votes = {};
+    for (const r of atNewest) votes[r.status] = (votes[r.status] || 0) + (r.verified ? 2 : 1);
+    const best = Math.max(...Object.values(votes));
+    const status = (atNewest.find((r) => votes[r.status] === best) || rs[0] || { status: "glitches" }).status;
+    // Trend: compare with the best-supported status on the version before.
+    const older = rs.filter((r) => r.version && newest && verCmp(r.version, newest) < 0);
+    let trend = "";
+    if (older.length && S[status].rank && S[older[0].status].rank) {
+      const d = S[status].rank - S[older[0].status].rank;
+      trend = d > 0 ? "better" : d < 0 ? "worse" : "";
+    }
+    const playerCount = rs.filter((r) => r.source === "player").length;
+    const stale = !!(state.meta.latest && newest && verCmp(newest, state.meta.latest) < 0) && status !== "closed";
+    const good = rs.filter((r) => r.source === "player" && S[r.status].rank >= 3 && r.settings);
+    const tally = {}; for (const r of good) tally[r.settings] = (tally[r.settings] || 0) + 1;
+    const bestSettings = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
+    const lastAt = rs.length ? rs[0].at : 0;
+    const summary = (rs.find((r) => r.status === status && r.note) || {}).note || g.note || "";
+    return { status, newest, support: atNewest.filter((r) => r.status === status).length, playerCount, stale, trend, bestSettings: bestSettings ? bestSettings[0] : "", lastAt, summary, sorted: rs };
+  }
+
+  // ---------- render ----------
+  function render() {
+    const games = buildGames();
+    $("sb-games").textContent = games.length;
+    $("sb-playable").textContent = games.filter((g) => g.status === "well" || g.status === "glitches").length;
+    $("sb-reports").textContent = state.reports.length;
+    $("sb-latest").textContent = state.meta.latest ? shortVer(state.meta.latest) : "-";
+    renderFilters(games);
+    const q = norm(state.query);
+    let shown = games.filter((g) => !state.filter || g.status === state.filter)
+      .filter((g) => !state.onlyLatest || !g.stale)
+      .filter((g) => !q || norm(g.name).includes(q) || norm(g.summary).includes(q) || (g.titleId && g.titleId.toLowerCase().includes(q.replace(/ /g, ""))));
+    const sorters = {
+      status: (a, b) => S[b.status].rank - S[a.status].rank || b.playerCount - a.playerCount || a.name.localeCompare(b.name),
+      recent: (a, b) => b.lastAt - a.lastAt || a.name.localeCompare(b.name),
+      reports: (a, b) => b.playerCount - a.playerCount || a.name.localeCompare(b.name),
+      az: (a, b) => a.name.localeCompare(b.name),
+    };
+    shown.sort(sorters[state.sort] || sorters.status);
+    $("list").replaceChildren(...shown.map(renderRow));
+    $("no-match").hidden = shown.length > 0;
+    $("game-names").replaceChildren(...games.map((g) => el("option", { value: g.name })));
+  }
+
+  function renderFilters(games) {
+    const counts = {}; for (const g of games) counts[g.status] = (counts[g.status] || 0) + 1;
+    const box = $("filters");
+    box.replaceChildren(el("button", { class: "chip", type: "button", "aria-pressed": String(!state.filter), onclick: () => { state.filter = null; render(); } },
+      "All", el("span", { class: "n" }, String(games.length))));
+    for (const k of ORDER) {
+      if (!counts[k]) continue;
+      box.append(el("button", { class: "chip", type: "button", "aria-pressed": String(state.filter === k), onclick: () => { state.filter = state.filter === k ? null : k; render(); } },
+        meter(k, true), S[k].label, el("span", { class: "n" }, String(counts[k]))));
+    }
+  }
+
+  function renderRow(g) {
+    const id = "g-" + slug(g.name);
+    const row = el("details", { class: "row", id });
+    if (state.open.has(g.name)) row.open = true;
+    row.addEventListener("toggle", () => {
+      if (row.open) { state.open.add(g.name); if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id); }
+      else state.open.delete(g.name);
+    });
+    const tags = el("span", { class: "tags" },
+      el("span", { class: "status-word" }, S[g.status].label),
+      g.newest ? el("span", { class: "tag" + (g.stale ? " dash" : "") }, "v" + shortVer(g.newest)) : el("span", { class: "tag dash" }, "version ?"),
+      g.playerCount ? el("span", { class: "tag inv" }, g.playerCount + (g.playerCount === 1 ? " result" : " results")) : null,
+      g.trend ? el("span", { class: "tag" }, g.trend === "better" ? "▲ better" : "▼ worse") : null);
+    row.append(el("summary", {}, meter(g.status), el("span", { style: "min-width:0;display:grid;gap:2px" },
+      el("span", { class: "name" }, g.name), el("span", { class: "sub" }, g.summary || "No notes yet.")), tags));
+
+    const facts = el("dl", { class: "facts" },
+      el("dt", {}, "Status"), el("dd", {}, `${S[g.status].label}` + (g.support > 1 ? ` (${g.support} results agree)` : "")),
+      el("dt", {}, "Last tested on"), el("dd", {}, g.newest ? "v" + shortVer(g.newest) + (g.stale ? `, not yet tested on v${shortVer(state.meta.latest)}` : ", the latest") : "Unknown version"),
+      g.bestSettings ? [el("dt", {}, "Settings that work"), el("dd", {}, g.bestSettings)] : null,
+      g.titleId ? [el("dt", {}, "Title ID"), el("dd", { class: "mono" }, g.titleId)] : null,
+      g.issues.length ? [el("dt", {}, "Issue reports"), el("dd", {}, g.issues.map((n, i) => [i ? " " : "", el("a", { href: `${UPSTREAM}/issues/${n}`, target: "_blank", rel: "noopener", class: "mono" }, "#" + n)]))] : null);
+    const actions = el("div", { class: "actions" },
+      el("button", { class: "btn solid", type: "button", onclick: () => openPost({ game: g.name }) }, "+ Post a result"),
+      el("button", { class: "btn", type: "button", onclick: (e) => copyLink(e.currentTarget, id) }, "Copy link"));
+    const timeline = el("div", { class: "timeline" }, g.sorted.map((r) => el("div", { class: "tl" }, meter(r.status, true),
+      el("div", {}, el("div", { class: "meta" }, [S[r.status].label, r.version && "v" + shortVer(r.version), r.console, r.fw && "FW " + r.fw, fmtDate(r.at),
+        r.source === "issues" ? "from issue reports" : null, r.verified ? "verified" : null].filter(Boolean).join(" · "),
+        r.url ? [" · ", el("a", { href: r.url, target: "_blank", rel: "noopener" }, r.by ? "@" + r.by : "on GitHub")] : null),
+        r.settings ? el("p", {}, "Settings: " + r.settings) : null,
+        r.note && r.source === "player" ? el("p", {}, r.note) : null))));
+    row.append(el("div", { class: "row-body" }, el("div", { style: "display:grid;gap:14px;align-content:start" }, facts, actions),
+      el("div", { style: "display:grid;gap:8px;align-content:start" }, el("span", { class: "caps" }, "History"), timeline)));
+    return row;
+  }
+
+  async function copyLink(btn, id) {
+    const url = location.href.split("#")[0] + "#" + id;
+    try { await navigator.clipboard.writeText(url); btn.textContent = "Link copied"; }
+    catch (_) { btn.textContent = url; }
+    setTimeout(() => { btn.textContent = "Copy link"; }, 2500);
+  }
+
+  $("q").addEventListener("input", (e) => { state.query = e.target.value; render(); });
+  $("sort").value = state.sort;
+  $("sort").addEventListener("change", (e) => { state.sort = e.target.value; savePrefs(); render(); });
+  $("only-latest").checked = state.onlyLatest;
+  $("only-latest").addEventListener("change", (e) => { state.onlyLatest = e.target.checked; savePrefs(); render(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) { e.preventDefault(); showTab("games"); $("q").focus(); }
+  });
+
+  // ---------- posting a result: a prefilled GitHub issue form ----------
+  const pick = $("f-status");
+  for (const k of POSTABLE) {
+    pick.append(el("input", { type: "radio", name: "f-status", id: "fs-" + k, value: k }), el("label", { for: "fs-" + k }, meter(k, true), S[k].label));
+  }
+  function openPost(prefill) {
+    showTab("games");
+    const f = $("post");
+    f.hidden = false;
+    $("f-copy").hidden = true; $("f-msg").textContent = "";
+    if (prefill.game !== undefined) $("f-game").value = prefill.game;
+    if (prefill.app) $("f-app").value = prefill.app; else if (!$("f-app").value) $("f-app").value = state.meta.latest ? shortVer(state.meta.latest) : "";
+    if (prefill.settings) $("f-settings").value = prefill.settings;
+    if (prefill.notes) $("f-notes").value = prefill.notes;
+    if (prefill.status) { const r = document.getElementById("fs-" + prefill.status); if (r) r.checked = true; }
+    f.scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    $("f-game").focus({ preventScroll: true });
+  }
+  function readPost() {
+    const v = (id, n) => $(id).value.trim().slice(0, n);
+    const chosen = document.querySelector('input[name="f-status"]:checked');
+    return { game: v("f-game", 120), status: chosen ? chosen.value : "", app: v("f-app", 20), fw: v("f-fw", 12), console: $("f-console").value, settings: v("f-settings", 120), notes: v("f-notes", 1500) };
+  }
+  function issueUrl(r) {
+    const q = new URLSearchParams({ template: "compat-report.yml", title: `[Compat] ${r.game}`, game: r.game, app: r.app, firmware: r.fw, settings: r.settings, notes: r.notes });
+    if (r.status) q.set("result", S[r.status].label);
+    if (r.console) q.set("console", r.console);
+    return `https://github.com/${OWN}/issues/new?${q}`;
+  }
+  $("post-open").addEventListener("click", () => openPost({}));
+  $("f-cancel").addEventListener("click", () => { $("post").hidden = true; });
+  $("post").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const r = readPost();
+    if (!r.game) { $("f-msg").textContent = "Enter the game's name."; $("f-game").focus(); return; }
+    if (!r.status) { $("f-msg").textContent = "Pick how it runs."; pick.querySelector("input").focus(); return; }
+    window.open(issueUrl(r), "_blank", "noopener");
+    $("f-msg").textContent = "GitHub opened in a new tab. Press Create there and your result joins the log.";
+  });
+  $("f-copy-btn").addEventListener("click", async () => {
+    const r = readPost();
+    const text = [`Game: ${r.game}`, `Result: ${r.status ? S[r.status].label : "?"}`, `ProsperoEden version: ${r.app || "?"}`, `PS5 system software: ${r.fw || "?"} (${r.console})`, `Settings: ${r.settings || "defaults"}`, "", r.notes].join("\n").trim();
+    const pre = $("f-copy"); pre.textContent = text; pre.hidden = false;
+    try { await navigator.clipboard.writeText(text); $("f-msg").textContent = "Copied."; }
+    catch (_) { const range = document.createRange(); range.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range); $("f-msg").textContent = "Selected. Copy it with your keyboard."; }
+  });
+
+  // ---------- loading: games.json in this repo + results posted as issues ----------
+  function section(body, heading) {
+    const m = body.match(new RegExp("###\\s*" + heading + "\\s*\\n+([\\s\\S]*?)(?=\\n###\\s|$)"));
+    const v = m ? m[1].trim() : "";
+    return v === "_No response_" ? "" : v;
+  }
+  async function loadAll() {
+    let base = false, live = false;
+    try {
+      const res = await fetch("data/games.json", { cache: "no-cache" });
+      if (res.ok) {
+        const data = await res.json();
+        state.meta = { latest: String(data.latest || ""), updated: String(data.updated || "") };
+        state.base = Array.isArray(data.games) ? data.games.filter((g) => g && g.name && S[g.status]) : [];
+        base = true;
+      }
+    } catch (_) {}
+    $("updated").textContent = state.meta.updated ? "Updated " + fmtDate(dayDate(state.meta.updated)) : "";
+    render();
+    try {
+      const reports = [];
+      for (let page = 1; page <= 5; page++) {
+        const res = await fetch(`https://api.github.com/repos/${OWN}/issues?labels=compat-report&state=open&per_page=100&page=${page}`, { headers: { Accept: "application/vnd.github+json" } });
+        if (!res.ok) break;
+        live = true;
+        const issues = await res.json();
+        if (!Array.isArray(issues)) break;
+        for (const i of issues) {
+          if (i.pull_request || typeof i.body !== "string") continue;
+          const b = i.body.slice(0, 8000);
+          const labels = Array.isArray(i.labels) ? i.labels.map((l) => String((l && l.name) || "").toLowerCase()) : [];
+          const game = (section(b, "Game") || String(i.title || "").replace(/^\[Compat\]\s*/i, "")).slice(0, 120).trim();
+          if (!game) continue;
+          reports.push({ game, status: BY_LABEL[section(b, "How it runs").toLowerCase()] || "glitches", app: section(b, "ProsperoEden version").slice(0, 20),
+            fw: section(b, "PS5 system software").slice(0, 12), console: section(b, "Console").slice(0, 20), settings: section(b, "Settings").slice(0, 120),
+            notes: section(b, "What happened").slice(0, 600), at: Date.parse(i.created_at) || 0, url: String(i.html_url || ""),
+            by: i.user && i.user.login ? String(i.user.login) : "", verified: labels.includes("verified") });
+        }
+        if (issues.length < 100) break;
+      }
+      state.reports = reports;
+    } catch (_) {}
+    $("loadnote").textContent = !base ? "Couldn't load the game list. Refresh to try again."
+      : live ? `${state.reports.length} player ${state.reports.length === 1 ? "result" : "results"} included, live from GitHub.`
+      : "Player results couldn't load right now (GitHub may be rate-limiting). Showing the base log.";
+    render();
+    openFromHash();
+  }
+
+  // ---------- tabs and deep links ----------
+  function showTab(name) {
+    const crash = name === "crash";
+    $("tab-games").setAttribute("aria-selected", String(!crash)); $("tab-crash").setAttribute("aria-selected", String(crash));
+    $("panel-games").hidden = crash; $("panel-crash").hidden = !crash;
+  }
+  $("tab-games").addEventListener("click", () => { showTab("games"); history.replaceState(null, "", location.pathname + location.search); });
+  $("tab-crash").addEventListener("click", () => { showTab("crash"); history.replaceState(null, "", "#crash"); });
+  $("crash-jump").addEventListener("click", (e) => { e.preventDefault(); showTab("crash"); history.replaceState(null, "", "#crash"); $("tab-crash").scrollIntoView({ block: "start" }); });
+  function openFromHash() {
+    const h = location.hash.slice(1);
+    if (h === "crash") { showTab("crash"); return; }
+    if (h.startsWith("g-")) {
+      const row = document.getElementById(h);
+      if (row) { showTab("games"); row.open = true; row.scrollIntoView({ block: "start" }); }
+    }
+  }
+  window.addEventListener("hashchange", openFromHash);
+  if (location.hash === "#crash") showTab("crash");
+
+  // ---------- crash explainer ----------
+  const EXAMPLE = `ProsperoEden crash report
+version: 01.002.000 (code size 0x25cfb10)
+time: 2026-10-15 13:54:52, 187 s after the app started
+what: the app stopped itself
+reason: mutex lock failed: Cannot allocate memory
+where: eboot+0xb4865
+thread: VkPipelineBuilder (0x880f55540)
+running: game TOTK [0100F2C0115B6000][v0].xci (0100f2c0115b6000), Vulkan, resolution 1x, Bilinear, output 1080p, 60 Hz, mods: none
+memory: largest free block 9584 MiB of 12416 MiB, heap 1920 MiB and 96 MiB in 1 large blocks`;
+
+  function parse(text) {
+    const line = (re) => { const m = text.match(re); return m ? m[1].trim() : ""; };
+    const p = { version: line(/^version:\s*([0-9.]+)/m), time: line(/^time:\s*(.+)$/m), what: line(/^what:\s*(.+)$/m), reason: line(/^reason:\s*(.+)$/m),
+      thread: line(/^thread:\s*([^\s(]+)/m), running: line(/^running:\s*(.+)$/m), memory: line(/^memory:\s*(.+)$/m), refused: line(/^heap refused:\s*(.+)$/m) };
+    const run = p.running, m = (re) => { const x = run.match(re); return x ? x[1] : ""; };
+    p.game = run ? run.replace(/^game\s+/, "").split(/\s*[[(]/)[0].replace(/\.(nsp|xci|nsz|xcz)$/i, "").trim() : "";
+    p.tid = ((run.match(/\[([0-9A-Fa-f]{16})\]/) || [])[1] || "").toUpperCase();
+    p.renderer = m(/\b(Vulkan|OpenGL)\b/); p.res = m(/resolution\s+([0-9.]+)x/); p.filter = m(/resolution\s+[0-9.]+x,\s*([^,]+)/);
+    p.output = m(/output\s+(\d{3,4}p)/); p.hz = m(/(\d{2,3})\s*Hz/); p.mods = m(/mods:\s*(.+)$/);
+    const mem = p.memory.match(/largest free block (\d+) MiB/); p.freeMiB = mem ? parseInt(mem[1], 10) : null;
+    p.seconds = parseInt((p.time.match(/(\d+) s after/) || [])[1] || "", 10); if (Number.isNaN(p.seconds)) p.seconds = null;
+    p.has = (re) => re.test(text);
+    return p;
+  }
+  const RULES = [
+    { hard: true, kind: "Blocks the game", title: "Out of thread locks", test: (p) => p.has(/mutex lock failed: Cannot allocate memory/i),
+      say: (p) => `Not normal memory: the console limits how many thread locks one app can hold, and the emulator used them up${p.thread ? ` on the ${p.thread} thread` : ""}. Games with thousands of shaders hit it while loading; so can an updates folder with lots of files.`,
+      tries: (p) => [p.thread === "VkPipelineBuilder" ? "This is the shader-loading case (Tears of the Kingdom stops here at about 75%). No setting avoids it yet; a fix is proposed upstream." : "Move update and DLC files for games you aren't playing out of the updates folder.", "Keep the report: it helps confirm the fix."],
+      issues: [204, 169] },
+    { hard: true, kind: "Crash cause", title: "A memory request failed", test: (p) => p.has(/std::bad_alloc/),
+      say: (p) => "The emulator asked for memory and the console said no. CPU and GPU share one 12 GB pool, so heavy graphics leave less for everything else." + (p.refused ? ` Refused: ${p.refused}.` : ""),
+      tries: () => ["Drop to 1x resolution and 1080p output.", "Use 60 Hz and turn frame generation off.", "Turn off texture packs and other big mods."], issues: [99] },
+    { hard: true, kind: "Crash cause", title: "The GPU stopped answering", test: (p) => p.has(/VK_ERROR_DEVICE_LOST/),
+      say: () => "The graphics chip hung or faulted, and the emulator noticed on the next frame. The game can't continue from this.",
+      tries: () => ["Try 1x, the Bilinear filter instead of AMD FSR, and 60 Hz.", "Switch to OpenGL once to see if the crash follows.", "Note how long it ran: a crash at the same spot is easier to fix."], issues: [207] },
+    { hard: true, kind: "Crash cause", title: "Graphics memory ran out", test: (p) => p.has(/OUT_OF_DEVICE_MEMORY|ran out of graphics? memory|refused outside the budget/i),
+      say: () => "Textures and render targets no longer fit in the memory the emulator has for graphics.",
+      tries: () => ["Lower the resolution and output resolution.", "Keep ASTC textures on the compressed setting.", "Turn off UltraCam and HD texture mods."], issues: [93, 151] },
+    { hard: true, kind: "Crash cause", title: "The GPU read missing memory", test: (p) => p.has(/GPU_FAULT|Protection fault|Unmapped page access/i),
+      say: () => "A GPU page fault. One cause, memory shrinking after relaunching a game, was fixed in 1.001.000.",
+      tries: (p) => [p.version && verCmp(p.version, "1.1.0") < 0 ? "Update ProsperoEden: your version predates that fix." : "Restart ProsperoEden before the game, and report it with logs if it repeats."], issues: [96] },
+    { hard: true, kind: "Crash cause", title: "Invalid memory access", test: (p) => p.has(/SIGSEGV|invalid memory access/i),
+      say: (p) => `The emulator touched an address it shouldn't${p.seconds !== null && p.seconds < 30 ? ", within seconds of starting" : ""}. Usually an emulator bug rather than your setup.`,
+      tries: () => ["Try 1x and no mods to see if a setting triggers it.", "Report it with the logs from the same folder."], issues: [109] },
+    { kind: "Mod", title: "UltraCam is on", test: (p) => /ultra\s*cam|nx-?optimizer/i.test(p.mods || ""),
+      say: () => "UltraCam needs more memory than the PS5 gives the emulator and makes the Zelda games crash or restart while loading.",
+      tries: () => ["Turn UltraCam off in the game's Mods settings."], issues: [151, 106] },
+    { kind: "Likely factor", title: "Heavy settings", test: (p) => parseFloat(p.res) >= 2 && (p.output === "2160p" || p.hz === "120"),
+      say: (p) => `${p.res}x with ${[p.output === "2160p" && "4K output", p.hz === "120" && "120 Hz"].filter(Boolean).join(" and ")} eats shared memory and GPU time.`,
+      tries: () => ["Start at 1x or 1.5x, 1080p or 1440p, 60 Hz, then raise one thing at a time."], issues: [99, 207] },
+    { kind: "Likely factor", title: "Memory nearly full", test: (p) => p.freeMiB !== null && p.freeMiB < 1500,
+      say: (p) => `Only ${p.freeMiB} MiB was free in one block when it crashed.`, tries: () => ["Lower graphics settings and restart ProsperoEden between games."], issues: [] },
+    { kind: "Note", title: "Older version", test: (p) => p.version && state.meta.latest && verCmp(p.version, state.meta.latest) < 0,
+      say: (p) => `This report is from v${shortVer(p.version)}; the latest is v${shortVer(state.meta.latest)}. Several crashes were fixed in between.`,
+      tries: () => ["Update from the menu, then try again."], issues: [] },
+  ];
+  function renderCrash() {
+    const text = $("crash-input").value, out = $("crash-results");
+    out.replaceChildren();
+    if (!text.trim()) { out.append(el("p", { class: "empty" }, "Paste a crash report to see what it means.")); return; }
+    const p = parse(text);
+    const isReport = !!(p.version || p.reason || p.what || p.running);
+    const settings = [p.renderer, p.res && p.res + "x", p.filter, p.output, p.hz && p.hz + " Hz"].filter(Boolean).join(", ");
+    const rows = [["Version", p.version && "v" + shortVer(p.version)], ["What", p.what], ["Reason", p.reason], ["Thread", p.thread], ["Game", p.game], ["Title ID", p.tid],
+      ["Settings", settings], ["Mods", p.mods], ["Memory", p.memory], ["Heap refused", p.refused], ["Ran for", p.seconds !== null ? p.seconds + " s" : ""]].filter((r) => r[1]);
+    if (rows.length) out.append(el("dl", { class: "parsed" }, rows.map(([k, v]) => [el("dt", {}, k), el("dd", {}, v)])));
+    const hits = RULES.filter((r) => { try { return r.test(p); } catch (_) { return false; } });
+    out.append(el("h2", { class: "section" }, hits.length ? "What it means" : isReport ? "Not a known crash yet" : "Not a crash report"));
+    const box = el("div", { class: "findings" });
+    if (hits.length) {
+      for (const r of hits) box.append(el("div", { class: "finding" + (r.hard ? " hard" : "") }, el("span", { class: "kind" }, r.kind), el("h3", {}, r.title),
+        el("p", {}, r.say(p)), el("ul", {}, r.tries(p).map((t) => el("li", {}, t))),
+        r.issues.length ? el("p", { class: "mono", style: "font-size:0.82rem" }, "Related: ", r.issues.map((n, i) => [i ? ", " : "", el("a", { href: `${UPSTREAM}/issues/${n}`, target: "_blank", rel: "noopener" }, "#" + n)])) : null));
+    } else {
+      box.append(el("div", { class: "finding" }, el("p", {}, isReport ? "None of the known patterns match. Post it with your result below so it can be added." : 'Crash reports start with "ProsperoEden crash report" and have lines like version:, reason: and running:.')));
+    }
+    out.append(box);
+    if (isReport) {
+      const known = buildGames().find((g) => (p.tid && g.titleId === p.tid) || (p.game && p.game.length >= 4 && norm(g.name).includes(norm(p.game))));
+      const actions = el("div", { class: "actions", style: "margin-top:12px" },
+        el("button", { class: "btn solid", type: "button", onclick: () => openPost({ game: known ? known.name : p.game, app: p.version ? shortVer(p.version) : "", status: "unplayable", settings,
+          notes: [p.reason && "Crash: " + p.reason, p.thread && "thread " + p.thread, p.seconds !== null && "after " + p.seconds + " s"].filter(Boolean).join(", ") }) }, "+ Post this as a result"),
+        known ? el("a", { class: "btn", href: "#g-" + slug(known.name), onclick: () => showTab("games") }, "See " + known.name.replace(/^The Legend of Zelda: /, "Zelda: ")) : null);
+      out.append(actions);
+    }
+  }
+  let timer = null;
+  $("crash-input").addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(renderCrash, 200); });
+  $("crash-clear").addEventListener("click", () => { $("crash-input").value = ""; renderCrash(); $("crash-input").focus(); });
+  $("crash-example").addEventListener("click", () => { $("crash-input").value = EXAMPLE; renderCrash(); });
+  $("crash-input").value = EXAMPLE;
+
+  loadAll().then(renderCrash);
+  renderCrash();
+})();
+</script>
+</body>
+</html>
