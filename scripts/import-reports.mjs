@@ -161,6 +161,13 @@ function gameName(fields, title) {
   return meaningful(fromTitle) ? fromTitle.slice(0, MAX_NAME) : "";
 }
 
+// Keeps "titleId" right after "name", as in the hand-written entries.
+function setTitleId(game, id) {
+  const rest = Object.entries(game).filter(([k]) => k !== "name");
+  for (const [k] of rest) delete game[k];
+  Object.assign(game, { titleId: id }, Object.fromEntries(rest));
+}
+
 function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 
 // One sentence from the issue title, minus tags, the title ID and the game's name.
@@ -231,7 +238,7 @@ for (const issue of recent) {
   } else {
     game.issues.push(issue.number);
     const lines = [`issue ${issue.number} added`];
-    if (titleId && !game.titleId) { game.titleId = titleId; lines.push(`title ID set to ${titleId}`); }
+    if (titleId && !game.titleId) { setTitleId(game, titleId); lines.push(`title ID set to ${titleId}`); }
     // A newer app version decides; a resolved game that gets a new report is reopened with it.
     const newer = version && version > (game.version || "");
     const reopen = game.status === "closed" && (!game.version || !version || version >= game.version);
