@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-15",
-  "latest": "1.003.000",
+  "updated": "2026-10-20",
+  "latest": "1.005.000",
   "statuses": "well | glitches | unplayable | wontstart | mods | closed",
   "games": [
     {
@@ -30,13 +30,15 @@
     },
     {
       "name": "Luigi's Mansion 3",
-      "status": "well",
-      "version": "1.001.000",
+      "titleId": "0100DCA0064A6000",
+      "status": "unplayable",
+      "version": "1.003.000",
       "issues": [
         150,
-        93
+        93,
+        236
       ],
-      "note": "Plays well (EU, v1.4.0). An early version ran out of graphics memory at the opening scene."
+      "note": "Frame rates collapse and the game crashes on Floor 10 (Tomb Suites) on 1.002.000 and 1.003.000, with or without mods (v1.4.0). An earlier report on 1.001.000 said it plays well, and an early version ran out of graphics memory at the opening scene."
     },
     {
       "name": "Monster Hunter Generations Ultimate",
@@ -60,12 +62,12 @@
     {
       "name": "Ori and the Blind Forest: Definitive Edition",
       "titleId": "010061D00DB74800",
-      "status": "glitches",
-      "version": "1.000.110",
+      "status": "closed",
+      "version": "1.005.000",
       "issues": [
         130
       ],
-      "note": "Plays with graphics glitches."
+      "note": "Blinking layers and dark patches were reported fixed in 1.005.000 and the issue was closed; another player still sees them in handheld mode."
     },
     {
       "name": "The Stretchers",
@@ -117,9 +119,10 @@
       "status": "glitches",
       "version": "1.000.110",
       "issues": [
-        116
+        116,
+        271
       ],
-      "note": "Slowdown in busy scenes, and torn or stretched frames."
+      "note": "Slowdown in busy scenes, and torn or stretched frames. A newer report on an unknown version says Super Mario Galaxy shows a black screen and goes back to the menu."
     },
     {
       "name": "Pokémon Legends: Z-A",
@@ -225,12 +228,14 @@
     },
     {
       "name": "Castlevania: Belmont's Curse",
+      "titleId": "0100BA4026E94000",
       "status": "wontstart",
       "version": "1.002.000",
       "issues": [
-        206
+        206,
+        279
       ],
-      "note": "Does not start."
+      "note": "Does not start; a second report shows it still crashing at launch on 1.002.000."
     },
     {
       "name": "Xenoblade Chronicles 2",
@@ -259,6 +264,43 @@
         134
       ],
       "note": "A crash a few seconds after launch (microphone input) was fixed."
+    },
+    {
+      "name": "Minecraft",
+      "titleId": "0100D71004694000",
+      "status": "wontstart",
+      "version": "1.003.000",
+      "issues": [
+        222
+      ],
+      "note": "Crashes while loading (game update 1.26.45)."
+    },
+    {
+      "name": "Kirby's Return to Dream Land Deluxe",
+      "status": "glitches",
+      "version": "1.003.000",
+      "issues": [
+        224
+      ],
+      "note": "Runs at about 52 fps where it should hold 60."
+    },
+    {
+      "name": "Mario + Rabbids Kingdom Battle",
+      "status": "glitches",
+      "version": "",
+      "issues": [
+        226
+      ],
+      "note": "Runs well, but a black spot is obvious from the start and blue lighting flickers at times (PS5 Pro, docked, default settings)."
+    },
+    {
+      "name": "Astral Chain",
+      "status": "well",
+      "version": "1.004.000",
+      "issues": [
+        262
+      ],
+      "note": "Plays well (USA, v1.0.1). Audio runs ahead of the opening cinematic, which a player says also happens in Eden on PC."
     }
   ]
 }
