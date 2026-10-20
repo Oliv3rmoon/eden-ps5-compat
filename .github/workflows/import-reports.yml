@@ -1,0 +1,55 @@
+name: Import ProsperoEden reports
+
+# Weekly, and on demand: read new public game reports from blackbearreloaded/ProsperoEden
+# and open a pull request that updates data/games.json. Nothing is pushed to main.
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays, 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: import-reports
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BRANCH: import/prospero-reports
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Read new reports
+        id: import
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/import-reports.mjs --write --summary "$RUNNER_TEMP/pr-body.md"
+
+      - name: Show the changes
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/pr-body.md" ]; then cat "$RUNNER_TEMP/pr-body.md" >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Open or update the pull request
+        if: steps.import.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TITLE: Import new ProsperoEden reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$BRANCH"
+          git add data/games.json data/import-state.json
+          git commit -m "$TITLE"
+          git push --force origin "$BRANCH"
+          if [ "$(gh pr view "$BRANCH" --json state --jq .state 2>/dev/null)" = "OPEN" ]; then
+            gh pr edit "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/pr-body.md"
+          else
+            gh pr create --base main --head "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/pr-body.md"
+          fi

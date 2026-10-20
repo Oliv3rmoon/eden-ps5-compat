@@ -18,6 +18,7 @@ Use the **[Game result form](https://github.com/Oliv3rmoon/eden-ps5-compat/issue
 
 ## Keeping the log up to date
 
+- **Weekly import:** every Monday a GitHub Action reads new game reports from the [ProsperoEden issues](https://github.com/blackbearreloaded/ProsperoEden/issues) and opens a pull request named **Import new ProsperoEden reports**. It adds games that aren't in the log yet, adds new issue numbers to games that are, takes a game's status and version from a report only when it's on a newer app version, and marks a game `closed` when all of its issues are closed. Check the names and notes, then merge. Run it any time from the **Actions** tab, or locally with `node scripts/import-reports.mjs` to see what it would change.
 - **Add or change a game:** edit [`data/games.json`](data/games.json) on GitHub, then commit. Each game has a `name`, an optional `titleId`, a `status` (`well`, `glitches`, `unplayable`, `wontstart`, `mods` or `closed`), the ProsperoEden `version` it was tested on, related upstream `issues`, and a `note`.
 - **New app release:** change `latest` in `data/games.json`. Games not tested on it get the dashed tag.
 - **Trust a result:** add the `verified` label to its issue. Verified results count double.
