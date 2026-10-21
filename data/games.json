@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-20",
+  "updated": "2026-10-21",
   "latest": "1.005.000",
   "statuses": "well | glitches | unplayable | wontstart | mods | closed",
   "games": [
@@ -45,9 +45,10 @@
       "status": "well",
       "version": "1.001.000",
       "issues": [
-        148
+        148,
+        260
       ],
-      "note": "Plays well (v1.5.0)."
+      "note": "Played well (v1.5.0) on 1.001.000. A player on issue #260 reports the same frame-rate drop as Kirby and the Forgotten Land on newer versions, which pull request #275 addresses."
     },
     {
       "name": "Metroid Prime 4",
@@ -90,11 +91,12 @@
     {
       "name": "Mario Kart 8 Deluxe",
       "status": "mods",
-      "version": "1.000.110",
+      "version": "1.005.000",
       "issues": [
-        120
+        120,
+        281
       ],
-      "note": "Crashes with the CTGDX mod (game v3.0.3). No report yet without mods."
+      "note": "On 1.005.000 it starts with its update and the Booster Course DLC beside it. With a mods folder in its game folder it doesn't start, even with the mod switched off: the folder's mods were also applied to the DLC. Pull request #288 fixes that, and the reporter confirmed it boots with that build; it isn't in a release yet. Until then, keep its mods in mods/0100152000022000/ instead. Earlier, on 1.000.110, it crashed with the CTGDX mod (game v3.0.3)."
     },
     {
       "name": "Top Racer Collection",
@@ -276,13 +278,24 @@
       "note": "Crashes while loading (game update 1.26.45)."
     },
     {
+      "name": "Kirby and the Forgotten Land",
+      "status": "glitches",
+      "version": "1.004.000",
+      "issues": [
+        260,
+        282
+      ],
+      "note": "Runs at 25–26 FPS instead of a steady 30 since 1.001.000 (it held 30 up to 1.000.110). Pull request #275 brings back a steady 30 FPS, confirmed by a tester on firmware 12.20 with game v1.1.0; it isn't in a release yet. CPU still reads 94–100% in the overlay."
+    },
+    {
       "name": "Kirby's Return to Dream Land Deluxe",
       "status": "glitches",
       "version": "1.003.000",
       "issues": [
-        224
+        224,
+        260
       ],
-      "note": "Runs at about 52 fps where it should hold 60."
+      "note": "Runs at about 52 fps where it should hold 60. A player on issue #260 reports the same slowdown as Kirby and the Forgotten Land, which pull request #275 addresses."
     },
     {
       "name": "Mario + Rabbids Kingdom Battle",
