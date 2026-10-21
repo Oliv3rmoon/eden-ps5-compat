@@ -1,16 +1,19 @@
 name: Import ProsperoEden reports
 
-# Weekly, and on demand: read new public game reports from blackbearreloaded/ProsperoEden
-# and open a pull request that updates data/games.json. Nothing is pushed to main.
+# Daily, and on demand: read new public game reports and releases from Swordpdf/ProsperoEden,
+# update data/games.json and publish it: the result is committed to main, and GitHub Pages
+# serves it. Issue text is only parsed as plain text (scripts/import-reports.mjs). A game already
+# in the log changes only when a report on a newer app version comes in, or all of its issues
+# are closed; edit data/games.json to correct one.
 
 on:
   schedule:
-    - cron: "17 6 * * 1" # Mondays, 06:17 UTC
+    - cron: "17 6 * * *" # every day, 06:17 UTC
   workflow_dispatch:
 
 permissions:
   contents: write
-  pull-requests: write
+  pages: write
 
 concurrency:
   group: import-reports
@@ -20,8 +23,6 @@ jobs:
   import:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      BRANCH: import/prospero-reports
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -29,27 +30,26 @@ jobs:
         id: import
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/import-reports.mjs --write --summary "$RUNNER_TEMP/pr-body.md"
+        run: node scripts/import-reports.mjs --write --summary "$RUNNER_TEMP/summary.md"
 
       - name: Show the changes
         if: always()
         run: |
-          if [ -f "$RUNNER_TEMP/pr-body.md" ]; then cat "$RUNNER_TEMP/pr-body.md" >> "$GITHUB_STEP_SUMMARY"; fi
+          if [ -f "$RUNNER_TEMP/summary.md" ]; then cat "$RUNNER_TEMP/summary.md" >> "$GITHUB_STEP_SUMMARY"; fi
 
-      - name: Open or update the pull request
+      - name: Publish
         if: steps.import.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TITLE: Import new ProsperoEden reports
         run: |
+          # The page must still be able to read what was written.
+          node -e 'const d = JSON.parse(require("fs").readFileSync("data/games.json", "utf8")); if (!Array.isArray(d.games) || !d.latest) process.exit(1)'
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -C "$BRANCH"
           git add data/games.json data/import-state.json
-          git commit -m "$TITLE"
-          git push --force origin "$BRANCH"
-          if [ "$(gh pr view "$BRANCH" --json state --jq .state 2>/dev/null)" = "OPEN" ]; then
-            gh pr edit "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/pr-body.md"
-          else
-            gh pr create --base main --head "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/pr-body.md"
-          fi
+          git commit -m "Import new ProsperoEden reports" -m "$(cat "$RUNNER_TEMP/summary.md")"
+          # Something pushed meanwhile (a manual edit) goes first; this lands on top of it.
+          git pull --rebase origin main
+          git push origin HEAD:main
+          # A push from this workflow's token does not always start a Pages build: ask for one.
+          gh api -X POST "repos/$GITHUB_REPOSITORY/pages/builds" --silent || echo "Pages build not requested; it will build on the next push"

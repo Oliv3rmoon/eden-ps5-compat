@@ -13,7 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const UPSTREAM = "blackbearreloaded/ProsperoEden";
+const UPSTREAM = "Swordpdf/ProsperoEden";
 const API = "https://api.github.com";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const GAMES_FILE = path.join(ROOT, "data/games.json");
@@ -196,6 +196,13 @@ const releases = (await apiAll(`/repos/${UPSTREAM}/releases?per_page=100`))
   .filter((r) => r.version)
   .sort((a, b) => (a.published < b.published ? 1 : -1));
 
+// A new ProsperoEden release becomes the log's latest version: games not tested on it get the
+// dashed tag until someone does.
+const newest = releases.reduce((top, r) => (r.version > top ? r.version : top), "");
+const latestBefore = data.latest;
+if (newest && (!data.latest || newest > data.latest)) data.latest = newest;
+const latestChanged = data.latest !== latestBefore;
+
 const recent = (await apiAll(`/repos/${UPSTREAM}/issues?state=all&since=${encodeURIComponent(since)}&sort=created&direction=asc&per_page=100`))
   .filter((i) => !i.pull_request);
 const issueState = new Map(recent.map((i) => [i.number, i.state]));
@@ -266,12 +273,14 @@ for (const game of changes.keys()) {
 }
 
 const changed = [...changes].filter(([, c]) => c.lines.length);
+const anyChange = changed.length > 0 || latestChanged;
 
 // ---------- report ----------
 
 const lines = [];
 lines.push(`Reports from \`${UPSTREAM}\` updated since ${since}.`, "");
-if (!changed.length) lines.push("No changes.");
+if (latestChanged) lines.push(`Latest ProsperoEden version: ${latestBefore || "none"} -> ${data.latest}.`, "");
+if (!anyChange) lines.push("No changes.");
 const added = changed.filter(([, c]) => c.added);
 const updated = changed.filter(([, c]) => !c.added);
 if (added.length) {
@@ -292,15 +301,15 @@ if (skipped.length) {
   for (const [n, why] of skipped) lines.push(`- issue ${n}: ${why}`);
   lines.push("");
 }
-lines.push("Issue numbers refer to the ProsperoEden repository. Check names and notes before merging; they come from the issue text.");
+lines.push("Issue numbers refer to the ProsperoEden repository. Names and notes come from the issue text; correct any in data/games.json.");
 const report = lines.join("\n") + "\n";
 process.stdout.write(report);
 
-if (WRITE && changed.length) {
+if (WRITE && anyChange) {
   data.updated = startedAt.slice(0, 10);
   fs.writeFileSync(GAMES_FILE, JSON.stringify(data, null, 2) + "\n");
   fs.writeFileSync(STATE_FILE, JSON.stringify({ since: startedAt }, null, 2) + "\n");
 }
 if (SUMMARY) fs.writeFileSync(SUMMARY, report);
-if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `changed=${changed.length > 0}\n`);
+if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `changed=${anyChange}\n`);
 if (!WRITE) process.stderr.write("\nDry run: no files written. Add --write to apply.\n");
