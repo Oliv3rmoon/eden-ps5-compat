@@ -314,6 +314,14 @@
         262
       ],
       "note": "Plays well (USA, v1.0.1). Audio runs ahead of the opening cinematic, which a player says also happens in Eden on PC."
+    },
+    {
+      "name": "Ori and the Will of the Wisps",
+      "titleId": "01008DD013200000",
+      "status": "well",
+      "version": "1.005.101",
+      "issues": [],
+      "note": "Starts and runs with its 1.2.1 update (a tester on Nightshade 1.005.101); how far it plays is not reported yet. Without the update (1.0.0) it hangs at Starting the game: put the update in updates/, or beside the game in roms/ from Nightshade 1.005.101."
     }
   ]
 }
