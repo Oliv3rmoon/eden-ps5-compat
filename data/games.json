@@ -321,7 +321,7 @@
       "status": "well",
       "version": "1.005.101",
       "issues": [],
-      "note": "Starts and runs with its 1.2.1 update (a tester on Nightshade 1.005.101); how far it plays is not reported yet. Without the update (1.0.0) it hangs at Starting the game: put the update in updates/, or beside the game in roms/ from Nightshade 1.005.101."
+      "note": "Plays perfectly with its 1.2.1 update (a tester on Nightshade 1.005.101). Without the update (1.0.0) it hangs at Starting the game: put the update in updates/, or beside the game in roms/ from Nightshade 1.005.101."
     }
   ]
 }
