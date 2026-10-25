@@ -1,12 +1,12 @@
 name: Game result
-description: How a Switch game runs in ProsperoEden on your PS5
+description: How a Switch game runs in Nightshade (or ProsperoEden) on your PS5
 title: "[Compat] "
 labels: ["compat-report"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for testing. Your result shows up on the [Eden PS5 Compat Log](https://oliv3rmoon.github.io/eden-ps5-compat/) within a minute or two.
+        Thanks for testing. Your result shows up on the [Nightshade Compat Log](https://oliv3rmoon.github.io/eden-ps5-compat/) within a minute or two.
         Don't post game files, keys, firmware or links to them.
   - type: input
     id: game
@@ -31,8 +31,9 @@ body:
   - type: input
     id: app
     attributes:
-      label: ProsperoEden version
-      placeholder: 1.002.000
+      label: App version
+      description: Nightshade or ProsperoEden, as the home screen shows it
+      placeholder: 1.005.100
   - type: input
     id: firmware
     attributes:

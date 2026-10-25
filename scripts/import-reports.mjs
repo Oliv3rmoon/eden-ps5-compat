@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Imports new public ProsperoEden game reports into data/games.json.
+// Imports new public ProsperoEden game reports into data/games.json, and moves the log's latest
+// version to the newest release of ProsperoEden or Nightshade (which is built on it).
 //
 //   node scripts/import-reports.mjs                 dry run: print what would change
 //   node scripts/import-reports.mjs --write         also write data/games.json and data/import-state.json
@@ -14,6 +15,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const UPSTREAM = "Swordpdf/ProsperoEden";
+const NIGHTSHADE = "Oliv3rmoon/Nightshade";
 const API = "https://api.github.com";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const GAMES_FILE = path.join(ROOT, "data/games.json");
@@ -190,14 +192,14 @@ const state = fs.existsSync(STATE_FILE) ? JSON.parse(fs.readFileSync(STATE_FILE,
 const since = SINCE_ARG || state.since || (data.updated ? data.updated + "T00:00:00Z" : "1970-01-01T00:00:00Z");
 const startedAt = new Date().toISOString().replace(/\.\d+Z$/, "Z");
 
-const releases = (await apiAll(`/repos/${UPSTREAM}/releases?per_page=100`))
+const releases = (await Promise.all([UPSTREAM, NIGHTSHADE].map((repo) => apiAll(`/repos/${repo}/releases?per_page=100`)))).flat()
   .filter((r) => !r.draft)
   .map((r) => ({ version: normVersion(r.tag_name), published: r.published_at }))
   .filter((r) => r.version)
   .sort((a, b) => (a.published < b.published ? 1 : -1));
 
-// A new ProsperoEden release becomes the log's latest version: games not tested on it get the
-// dashed tag until someone does.
+// A new ProsperoEden or Nightshade release becomes the log's latest version: games not tested on
+// it get the dashed tag until someone does.
 const newest = releases.reduce((top, r) => (r.version > top ? r.version : top), "");
 const latestBefore = data.latest;
 if (newest && (!data.latest || newest > data.latest)) data.latest = newest;
@@ -279,7 +281,7 @@ const anyChange = changed.length > 0 || latestChanged;
 
 const lines = [];
 lines.push(`Reports from \`${UPSTREAM}\` updated since ${since}.`, "");
-if (latestChanged) lines.push(`Latest ProsperoEden version: ${latestBefore || "none"} -> ${data.latest}.`, "");
+if (latestChanged) lines.push(`Latest app version: ${latestBefore || "none"} -> ${data.latest}.`, "");
 if (!anyChange) lines.push("No changes.");
 const added = changed.filter(([, c]) => c.added);
 const updated = changed.filter(([, c]) => !c.added);

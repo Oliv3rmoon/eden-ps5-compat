@@ -3,182 +3,195 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Eden PS5 Compat Log</title>
-<meta name="description" content="Unofficial community log of how Switch games run in the ProsperoEden emulator on PS5, with a crash report explainer.">
-<meta property="og:title" content="Eden PS5 Compat Log">
-<meta property="og:description" content="Which Switch games run in ProsperoEden on PS5, from public reports and players. Paste a crash report to see what it means.">
+<title>Nightshade Compat Log</title>
+<meta name="description" content="Unofficial community log of how Switch games run in Nightshade and ProsperoEden on PS5, with a crash report explainer.">
+<meta name="theme-color" content="#09090b">
+<meta property="og:title" content="Nightshade Compat Log">
+<meta property="og:description" content="Which Switch games run in Nightshade on PS5, from public reports and players. Paste a crash report to see what it means.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://oliv3rmoon.github.io/eden-ps5-compat/">
 <link rel="canonical" href="https://oliv3rmoon.github.io/eden-ps5-compat/">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='black'/%3E%3Crect x='5' y='12' width='4' height='8' fill='white'/%3E%3Crect x='11' y='12' width='4' height='8' fill='white'/%3E%3Crect x='17' y='12' width='4' height='8' fill='white'/%3E%3Crect x='23.5' y='12.5' width='3' height='7' fill='none' stroke='white'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Crect x='-50' y='-50' width='100' height='100' rx='22' fill='%2309090b'/%3E%3Cg fill='%23e5484d'%3E%3Cpath id='p' d='M0 0C13-9 15-27 0-40C-15-27-13-9 0 0Z'/%3E%3Cuse href='%23p' transform='rotate(72)'/%3E%3Cuse href='%23p' transform='rotate(144)'/%3E%3Cuse href='%23p' transform='rotate(216)'/%3E%3Cuse href='%23p' transform='rotate(288)'/%3E%3C/g%3E%3Ccircle r='7' fill='%23fff1e6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Instrument+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
 <style>
-/* Layout: a black-and-white arcade score sheet. Inverted masthead, thick rules, a 4-cell playability meter instead of colour. */
+/* Nightshade: near black, one red, soft edges. A 4-cell playability meter carries the status. */
 :root {
-  --paper: #ffffff;
-  --ink: #000000;
-  --grey: #5c5c5c;
-  --rule: #000000;
-  --hair: #d6d6d6;
-  --wash: #f2f2f2;
-  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
-  --body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --bg: #09090b;
+  --surface: #111114;
+  --raised: #18181c;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-2: rgba(255, 255, 255, 0.13);
+  --text: #f4f4f5;
+  --muted: #a1a1aa;
+  --faint: #71717a;
+  --red: #e5484d;
+  --red-hi: #ff6369;
+  --red-deep: #3b0d11;
+  --pale: #f3a9ad;
+  --glow: rgba(229, 72, 77, 0.28);
+  --r: 16px;
+  --r-sm: 11px;
+  --display: "Inter Tight", "Instrument Sans", system-ui, sans-serif;
+  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
-  color-scheme: light;
+  color-scheme: dark;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --paper: #000000; --ink: #ffffff; --grey: #a3a3a3; --rule: #ffffff; --hair: #2e2e2e; --wash: #111111; color-scheme: dark; }
-}
-:root[data-theme="dark"] { --paper: #000000; --ink: #ffffff; --grey: #a3a3a3; --rule: #ffffff; --hair: #2e2e2e; --wash: #111111; color-scheme: dark; }
 :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
-body { background: var(--paper); color: var(--ink); font: 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; }
-a { color: inherit; text-underline-offset: 3px; }
-:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+body { background: var(--bg); color: var(--text); font: 16px/1.55 var(--body); -webkit-font-smoothing: antialiased; }
+::selection { background: var(--red); color: #fff; }
+a { color: var(--pale); text-underline-offset: 3px; text-decoration-color: rgba(243, 169, 173, 0.35); }
+a:hover { color: #fff; text-decoration-color: var(--red); }
+:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .inner { max-width: 1080px; margin: 0 auto; }
 .mono { font-family: var(--mono); }
-.caps { font: 700 0.74rem var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
+.caps { font: 600 0.72rem var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
 
 /* masthead */
-.mast { background: var(--ink); color: var(--paper); padding-block: 28px 24px; }
-.mast .inner { display: grid; gap: 18px; }
-.mast-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; align-items: baseline; }
-h1 { font: 900 clamp(3rem, 11vw, 7.5rem)/0.84 var(--display); text-transform: uppercase; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
-h1 span { display: block; -webkit-text-stroke: 2px var(--paper); color: transparent; }
-.lede { margin: 0; max-width: 60ch; font-size: 1.05rem; }
-.scoreboard { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 2px solid var(--paper); }
-.scoreboard div { padding: 10px 12px; border-left: 2px solid var(--paper); min-width: 0; }
-.scoreboard div:first-child { border-left: 0; }
-.scoreboard b { display: block; font: 900 clamp(1.6rem, 4vw, 2.3rem)/1 var(--display); font-variant-numeric: tabular-nums; }
-.scoreboard small { font: 600 0.7rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.8; }
+.mast { position: relative; overflow: hidden; padding-block: 34px 30px; border-bottom: 1px solid var(--line);
+  background: radial-gradient(900px 420px at 88% -10%, rgba(229, 72, 77, 0.22), transparent 62%),
+    radial-gradient(700px 360px at -10% 120%, rgba(90, 20, 25, 0.35), transparent 60%), var(--bg); }
+.mast .inner { display: grid; gap: 20px; position: relative; }
+.mast-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; align-items: center; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font: 700 0.95rem var(--display); letter-spacing: 0.01em; }
+.brand svg { width: 28px; height: 28px; filter: drop-shadow(0 0 10px var(--glow)); }
+.brand small { font: 600 0.68rem var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint); margin-left: 4px; }
+h1 { font: 800 clamp(2.6rem, 8.5vw, 5.4rem)/0.95 var(--display); letter-spacing: -0.04em; margin: 0; text-wrap: balance; }
+h1 span { display: block; background: linear-gradient(100deg, #fff 0%, var(--pale) 55%, var(--red) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lede { margin: 0; max-width: 62ch; font-size: 1.05rem; color: var(--muted); }
+.scoreboard { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.scoreboard div { padding: 14px 16px; min-width: 0; background: rgba(17, 17, 20, 0.72); border: 1px solid var(--line); border-radius: var(--r); backdrop-filter: blur(6px); }
+.scoreboard b { display: block; font: 700 clamp(1.6rem, 4vw, 2.2rem)/1.05 var(--display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.scoreboard div:nth-child(2) b { color: var(--red-hi); }
+.scoreboard small { display: block; margin-top: 4px; font: 600 0.66rem/1.35 var(--body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
+#sb-latest { font-size: clamp(1.15rem, 3.2vw, 1.9rem); line-height: 1.25; white-space: nowrap; }
 .mast-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.btn { font: 700 0.92rem var(--body); letter-spacing: 0.04em; text-transform: uppercase; padding: 11px 16px; border: 2px solid var(--ink);
-  background: var(--paper); color: var(--ink); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
-.btn:hover { background: var(--ink); color: var(--paper); }
-.btn.solid { background: var(--ink); color: var(--paper); }
-.btn.solid:hover { background: var(--paper); color: var(--ink); }
-.mast .btn { border-color: var(--paper); background: var(--ink); color: var(--paper); }
-.mast .btn:hover, .mast .btn.solid { background: var(--paper); color: var(--ink); }
-.mast .btn.solid:hover { background: var(--ink); color: var(--paper); }
+.btn { font: 600 0.9rem var(--body); padding: 10px 18px; border: 1px solid var(--line-2); border-radius: 999px; background: transparent; color: var(--text);
+  cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.btn:hover { background: var(--raised); border-color: rgba(255, 255, 255, 0.22); color: #fff; }
+.btn.solid { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 6px 22px -8px var(--glow); }
+.btn.solid:hover { background: var(--red-hi); border-color: var(--red-hi); }
 
 /* tabs */
-.tabbar { border-bottom: 3px solid var(--rule); position: sticky; top: env(safe-area-inset-top, 0px); background: var(--paper); z-index: 5; }
-.tabbar .inner { display: flex; gap: 0; }
-.tabbar button { font: 900 1.25rem var(--display); text-transform: uppercase; letter-spacing: 0.04em; background: none; border: 0; color: var(--grey);
-  padding: 12px 18px 10px; cursor: pointer; }
-.tabbar button[aria-selected="true"] { color: var(--paper); background: var(--ink); }
-main { padding-block: 22px 56px; }
+.tabbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(12px) saturate(140%);
+  border-bottom: 1px solid var(--line); }
+.tabbar .inner { display: flex; gap: 4px; padding-block: 8px; }
+.tabbar button { font: 600 0.95rem var(--body); background: none; border: 0; color: var(--muted); padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+.tabbar button:hover { color: var(--text); }
+.tabbar button[aria-selected="true"] { color: #fff; background: var(--raised); box-shadow: inset 0 0 0 1px var(--line-2); }
+main { padding-block: 24px 64px; }
 .panel { display: grid; gap: 18px; }
 
 /* meter: four cells, filled by how playable */
-.meter { display: inline-grid; grid-template-columns: repeat(4, 9px); gap: 3px; flex: none; }
-.meter i { height: 18px; border: 2px solid var(--ink); display: block; }
-.meter i.on { background: var(--ink); }
-.meter i.hatch { background: repeating-linear-gradient(135deg, var(--ink) 0 2px, transparent 2px 5px); }
-.meter.closed i { border-style: dashed; border-color: var(--grey); }
-.meter.small { grid-template-columns: repeat(4, 6px); gap: 2px; }
-.meter.small i { height: 12px; border-width: 1.5px; }
+.meter { display: inline-grid; grid-template-columns: repeat(4, 8px); gap: 3px; flex: none; }
+.meter i { height: 20px; border-radius: 3px; display: block; background: rgba(255, 255, 255, 0.08); }
+.meter i.on { background: linear-gradient(180deg, var(--red-hi), var(--red)); box-shadow: 0 0 8px -2px var(--glow); }
+.meter i.hatch { background: repeating-linear-gradient(135deg, var(--red) 0 2px, transparent 2px 5px); }
+.meter.closed i { background: transparent; box-shadow: inset 0 0 0 1px var(--line-2); }
+.meter.small { grid-template-columns: repeat(4, 5px); gap: 2px; }
+.meter.small i { height: 12px; border-radius: 2px; }
 
 /* filters */
 .controls { display: grid; gap: 12px; }
 .filters { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { display: inline-flex; align-items: center; gap: 9px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink);
-  padding: 6px 12px 6px 9px; font: 600 0.9rem var(--body); cursor: pointer; }
-.chip .n { font-family: var(--mono); font-size: 0.82rem; }
-.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
-.chip[aria-pressed="true"] .meter i { border-color: var(--paper); }
-.chip[aria-pressed="true"] .meter i.on { background: var(--paper); }
-.chip[aria-pressed="true"] .meter i.hatch { background: repeating-linear-gradient(135deg, var(--paper) 0 2px, transparent 2px 5px); }
+.chip { display: inline-flex; align-items: center; gap: 9px; border: 1px solid var(--line-2); background: var(--surface); color: var(--text);
+  padding: 6px 13px 6px 10px; border-radius: 999px; font: 500 0.88rem var(--body); cursor: pointer; }
+.chip:hover { border-color: rgba(255, 255, 255, 0.24); }
+.chip .n { font: 0.78rem var(--mono); color: var(--faint); }
+.chip[aria-pressed="true"] { background: var(--red-deep); border-color: rgba(229, 72, 77, 0.6); color: #fff; }
+.chip[aria-pressed="true"] .n { color: var(--pale); }
 .searchrow { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
 .search { flex: 1 1 280px; min-width: 0; position: relative; }
-.search input { width: 100%; font: 1.05rem var(--body); padding: 12px 44px 12px 14px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 0; }
-.search kbd { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font: 600 0.78rem var(--mono); border: 1.5px solid var(--grey); color: var(--grey); padding: 0 6px; }
-select { font: 600 0.92rem var(--body); padding: 0 12px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 0; min-height: 48px; }
-.toggle { display: inline-flex; align-items: center; gap: 8px; font: 600 0.92rem var(--body); cursor: pointer; border: 2px solid var(--ink); padding: 0 12px; min-height: 48px; }
-.toggle input { accent-color: var(--ink); width: 18px; height: 18px; margin: 0; }
+.search input { width: 100%; font: 1rem var(--body); padding: 12px 44px 12px 16px; border: 1px solid var(--line-2); background: var(--surface); color: var(--text); border-radius: var(--r-sm); }
+.search input::placeholder { color: var(--faint); }
+.search input:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(229, 72, 77, 0.18); }
+.search kbd { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font: 600 0.74rem var(--mono); border: 1px solid var(--line-2); border-radius: 6px; color: var(--faint); padding: 1px 7px; }
+select { font: 500 0.9rem var(--body); padding: 0 12px; border: 1px solid var(--line-2); background: var(--surface); color: var(--text); border-radius: var(--r-sm); min-height: 48px; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font: 500 0.9rem var(--body); cursor: pointer; border: 1px solid var(--line-2); border-radius: var(--r-sm); background: var(--surface); padding: 0 14px; min-height: 48px; }
+.toggle input { accent-color: var(--red); width: 17px; height: 17px; margin: 0; }
 
 /* rows */
-.list { border-top: 3px solid var(--rule); }
-.row { border-bottom: 1px solid var(--ink); }
-.row > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 14px 4px; }
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.list:empty { display: none; }
+.row { border-bottom: 1px solid var(--line); }
+.row:last-child { border-bottom: 0; }
+.row > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 14px 18px; }
 .row > summary::-webkit-details-marker { display: none; }
-.row > summary:hover { background: var(--wash); }
-.name { font: 700 1.08rem/1.25 var(--body); }
-.sub { color: var(--grey); font-size: 0.92rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row > summary:hover, .row[open] > summary { background: var(--raised); }
+.name { font: 600 1.04rem/1.3 var(--body); }
+.sub { color: var(--muted); font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .row[open] .sub { white-space: normal; }
-.tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
-.tag { font: 600 0.74rem var(--mono); border: 1.5px solid var(--ink); padding: 1px 6px; white-space: nowrap; }
-.tag.inv { background: var(--ink); color: var(--paper); }
-.tag.dash { border-style: dashed; color: var(--grey); border-color: var(--grey); }
-.status-word { font: 900 1.05rem var(--display); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
-.row-body { padding: 4px 4px 20px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+.tags { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px; }
+.tag { font: 500 0.72rem var(--mono); border: 1px solid var(--line-2); color: var(--muted); padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.tag.inv { background: var(--red-deep); border-color: rgba(229, 72, 77, 0.45); color: var(--pale); }
+.tag.dash { border-style: dashed; color: var(--faint); }
+.status-word { font: 600 0.82rem var(--body); color: var(--text); white-space: nowrap; }
+.row-body { padding: 6px 18px 22px; display: grid; gap: 18px; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); background: var(--raised); }
 @media (max-width: 760px) { .row-body { grid-template-columns: minmax(0, 1fr); } }
-.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; margin: 0; font-size: 0.93rem; }
-.facts dt { color: var(--grey); }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 5px 16px; margin: 0; font-size: 0.92rem; }
+.facts dt { color: var(--faint); }
 .facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
-.timeline { display: grid; gap: 0; border-left: 3px solid var(--ink); }
-.tl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 8px 0 8px 12px; border-bottom: 1px dashed var(--hair); }
+.timeline { display: grid; gap: 0; border-left: 2px solid rgba(229, 72, 77, 0.5); }
+.tl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 8px 0 8px 12px; border-bottom: 1px solid var(--line); }
 .tl:last-child { border-bottom: 0; }
-.tl .meta { font: 0.78rem var(--mono); color: var(--grey); }
-.tl p { margin: 2px 0 0; font-size: 0.92rem; overflow-wrap: anywhere; }
+.tl .meta { font: 0.76rem var(--mono); color: var(--faint); }
+.tl p { margin: 2px 0 0; font-size: 0.9rem; overflow-wrap: anywhere; color: var(--muted); }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.empty { color: var(--grey); font-style: italic; margin: 0; }
-.loadnote { font: 0.82rem var(--mono); color: var(--grey); }
+.empty { color: var(--faint); margin: 0; }
+.loadnote { font: 0.8rem var(--mono); color: var(--faint); }
 
 /* post form */
-.post { border: 3px solid var(--ink); padding: 18px; display: grid; gap: 14px; background: var(--paper); }
-.post h2 { font: 900 1.8rem/1 var(--display); text-transform: uppercase; margin: 0; }
+.post { border: 1px solid var(--line-2); border-radius: var(--r); padding: 20px; display: grid; gap: 14px; background: linear-gradient(180deg, rgba(229, 72, 77, 0.06), transparent 40%), var(--surface); }
+.post h2 { font: 700 1.5rem/1.1 var(--display); letter-spacing: -0.02em; margin: 0; }
 .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-.field { display: grid; gap: 4px; min-width: 0; }
-.field label { font: 700 0.74rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; }
-.field input, .field select, .field textarea { font: 1rem var(--body); padding: 9px 10px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 0; min-width: 0; width: 100%; }
-.field textarea { min-height: 80px; resize: vertical; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field label { font: 600 0.7rem var(--body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.field input, .field select, .field textarea { font: 0.98rem var(--body); padding: 10px 12px; border: 1px solid var(--line-2); background: var(--bg); color: var(--text); border-radius: var(--r-sm); min-width: 0; width: 100%; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(229, 72, 77, 0.18); }
+.field textarea { min-height: 84px; resize: vertical; }
 .statuspick { display: flex; flex-wrap: wrap; gap: 8px; border: 0; padding: 0; margin: 0; }
-.statuspick legend { font: 700 0.74rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; padding: 0; }
-.statuspick label { display: inline-flex; align-items: center; gap: 8px; border: 2px solid var(--ink); padding: 7px 11px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+.statuspick legend { font: 600 0.7rem var(--body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; padding: 0; }
+.statuspick label { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line-2); border-radius: 999px; padding: 7px 13px; cursor: pointer; font-weight: 500; font-size: 0.88rem; background: var(--bg); }
 .statuspick input { position: absolute; opacity: 0; pointer-events: none; }
-.statuspick input:checked + label { background: var(--ink); color: var(--paper); }
-.statuspick input:checked + label .meter i { border-color: var(--paper); }
-.statuspick input:checked + label .meter i.on { background: var(--paper); }
-.statuspick input:checked + label .meter i.hatch { background: repeating-linear-gradient(135deg, var(--paper) 0 2px, transparent 2px 5px); }
-.statuspick input:focus-visible + label { outline: 3px solid var(--ink); outline-offset: 2px; }
+.statuspick input:checked + label { background: var(--red-deep); border-color: rgba(229, 72, 77, 0.6); color: #fff; }
+.statuspick input:focus-visible + label { outline: 2px solid var(--red); outline-offset: 2px; }
 .formrow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.note { font-size: 0.9rem; color: var(--grey); }
-pre.copyout { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--wash); border: 1px solid var(--ink); padding: 12px; margin: 0; font: 0.82rem/1.5 var(--mono); }
+.note { font-size: 0.9rem; color: var(--muted); }
+pre.copyout { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--bg); border: 1px solid var(--line-2); border-radius: var(--r-sm); padding: 12px; margin: 0; font: 0.8rem/1.55 var(--mono); }
 
 /* crash explainer */
 .crash-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: start; }
 @media (max-width: 860px) { .crash-grid { grid-template-columns: minmax(0, 1fr); } }
-textarea#crash-input { width: 100%; min-height: 380px; font: 0.8rem/1.55 var(--mono); padding: 14px; border: 3px solid var(--ink); background: var(--ink); color: var(--paper); resize: vertical; border-radius: 0; }
-.parsed { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 3px 14px; margin: 0; border: 2px solid var(--ink); padding: 12px 14px; font-size: 0.9rem; }
-.parsed dt { font: 700 0.72rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); padding-top: 2px; }
-.parsed dd { margin: 0; font: 0.82rem var(--mono); overflow-wrap: anywhere; min-width: 0; }
-.finding { border: 2px solid var(--ink); display: grid; gap: 6px; padding: 14px; }
-.finding.hard { background: var(--ink); color: var(--paper); }
-.finding .kind { font: 700 0.72rem var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
-.finding h3 { font: 900 1.5rem/1.05 var(--display); text-transform: uppercase; margin: 0; }
-.finding p { margin: 0; }
+textarea#crash-input { width: 100%; min-height: 380px; font: 0.78rem/1.6 var(--mono); padding: 16px; border: 1px solid var(--line-2); border-radius: var(--r); background: #0c0c0f; color: #e4e4e7; resize: vertical; }
+.parsed { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; margin: 0; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 14px 16px; font-size: 0.9rem; }
+.parsed dt { font: 600 0.68rem var(--body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); padding-top: 3px; }
+.parsed dd { margin: 0; font: 0.8rem var(--mono); overflow-wrap: anywhere; min-width: 0; }
+.finding { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); display: grid; gap: 7px; padding: 16px; }
+.finding.hard { border-color: rgba(229, 72, 77, 0.45); background: linear-gradient(135deg, rgba(229, 72, 77, 0.14), rgba(229, 72, 77, 0.02) 60%), var(--surface); }
+.finding .kind { font: 600 0.68rem var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--pale); }
+.finding h3 { font: 700 1.25rem/1.15 var(--display); letter-spacing: -0.015em; margin: 0; }
+.finding p { margin: 0; color: var(--muted); }
 .finding ul { margin: 0; padding-left: 1.1em; }
+.finding li::marker { color: var(--red); }
 .findings { display: grid; gap: 10px; }
-h2.section { font: 900 1.6rem/1 var(--display); text-transform: uppercase; margin: 6px 0 0; }
+h2.section { font: 700 1.3rem/1.1 var(--display); letter-spacing: -0.02em; margin: 8px 0 0; }
 
-footer { border-top: 3px solid var(--rule); padding-block: 18px 32px; color: var(--grey); font-size: 0.88rem; }
-footer .inner { display: grid; gap: 6px; }
+footer { border-top: 1px solid var(--line); padding-block: 22px 36px; color: var(--faint); font-size: 0.86rem; }
+footer .inner { display: grid; gap: 8px; }
 footer p { margin: 0; max-width: 85ch; }
 @media (max-width: 600px) {
   .scoreboard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .scoreboard div:nth-child(3) { border-left: 0; }
-  .scoreboard div:nth-child(n+3) { border-top: 2px solid var(--paper); }
-  .row > summary { grid-template-columns: auto minmax(0, 1fr); }
+  .row > summary { grid-template-columns: auto minmax(0, 1fr); padding: 14px; }
   .row > summary .tags { grid-column: 1 / -1; justify-content: flex-start; }
+  .row-body { padding: 6px 14px 20px; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .btn, .chip, .row > summary { transition: background-color 0.12s, color 0.12s; }
+  .btn, .chip, .row > summary, .tabbar button, .search input, .field input, .field select, .field textarea { transition: background-color 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s; }
 }
 </style>
 </head>
@@ -186,20 +199,21 @@ footer p { margin: 0; max-width: 85ch; }
 <header class="mast gutter">
   <div class="inner">
     <div class="mast-top">
-      <span class="caps">Unofficial community log</span>
+      <a class="brand" href="https://github.com/Oliv3rmoon/Nightshade" target="_blank" rel="noopener"><svg viewBox="-50 -50 100 100" aria-hidden="true"><defs><radialGradient id="petal" cx="0" cy="0" r="44" gradientUnits="userSpaceOnUse"><stop offset="0.15" stop-color="#5a1419"/><stop offset="1" stop-color="#ff6369"/></radialGradient></defs><g fill="url(#petal)"><path id="pt" d="M0 0C13-9 15-27 0-44C-15-27-13-9 0 0Z"/><use href="#pt" transform="rotate(72)"/><use href="#pt" transform="rotate(144)"/><use href="#pt" transform="rotate(216)"/><use href="#pt" transform="rotate(288)"/></g><path d="M0-13 3.1-4.2 12.4-4 5-1.6 7.6 10.5 0 3.4-7.6 10.5-5-1.6-12.4-4-3.1-4.2Z" fill="#fff1e6"/></svg>Nightshade<small>unofficial</small></a>
       <span class="caps mono" id="updated"></span>
     </div>
-    <h1>Eden PS5<span>Compat Log</span></h1>
-    <p class="lede">Which Switch games run in the ProsperoEden emulator on PS5. Statuses update from player results as they come in, and the crash explainer turns a crash report into plain English.</p>
+    <h1><span>Nightshade</span>Compat Log</h1>
+    <p class="lede">Which Switch games run in Nightshade on PS5. Results from ProsperoEden count too, since Nightshade is built on it. Statuses update as players post results, and the crash explainer turns a crash report into plain English.</p>
     <div class="scoreboard" aria-label="Totals">
       <div><b id="sb-games">0</b><small>Games logged</small></div>
       <div><b id="sb-playable">0</b><small>Playable</small></div>
       <div><b id="sb-reports">0</b><small>Player results</small></div>
-      <div><b id="sb-latest">-</b><small>Latest app</small></div>
+      <div><b id="sb-latest">-</b><small>Latest version</small></div>
     </div>
     <div class="mast-actions">
       <button class="btn solid" type="button" id="post-open">+ Post a result</button>
       <a class="btn" href="#crash" id="crash-jump">Explain a crash</a>
+      <a class="btn" href="https://github.com/Oliv3rmoon/Nightshade/releases/latest" target="_blank" rel="noopener">Get Nightshade</a>
     </div>
   </div>
 </header>
@@ -219,7 +233,7 @@ footer p { margin: 0; max-width: 85ch; }
         <p class="note">Fill this in and press Post on GitHub: it opens a ready-made report there. Once you submit it, your result is added to the log and the game's status updates.</p>
         <div class="fields">
           <div class="field"><label for="f-game">Game</label><input id="f-game" list="game-names" required maxlength="120" placeholder="Super Mario Odyssey" autocomplete="off"></div>
-          <div class="field"><label for="f-app">ProsperoEden version</label><input id="f-app" maxlength="20" placeholder="1.002.000"></div>
+          <div class="field"><label for="f-app">App version</label><input id="f-app" maxlength="20" placeholder="1.005.100"></div>
           <div class="field"><label for="f-fw">PS5 system software</label><input id="f-fw" maxlength="12" placeholder="9.60"></div>
           <div class="field"><label for="f-console">Console</label><select id="f-console"><option>PS5</option><option>PS5 Slim</option><option>PS5 Pro</option><option>PS5 Digital</option></select></div>
         </div>
@@ -270,8 +284,8 @@ footer p { margin: 0; max-width: 85ch; }
 
 <footer class="gutter">
   <div class="inner">
-    <p>Unofficial and community-run. Not affiliated with or endorsed by the ProsperoEden project, BlackBearReloaded, the Eden project, Sony or Nintendo. Starting statuses come from public reports in the <a href="https://github.com/Swordpdf/ProsperoEden/issues" target="_blank" rel="noopener">ProsperoEden issue tracker</a>; your results may differ.</p>
-    <p>Only play games you own, dumped from your own hardware. Never post game files, keys or firmware. <a href="https://github.com/Oliv3rmoon/eden-ps5-compat" target="_blank" rel="noopener">Source and results on GitHub</a>.</p>
+    <p>Unofficial and community-run, by <a href="https://github.com/Oliv3rmoon" target="_blank" rel="noopener">Oliv3rmoon</a>. <a href="https://github.com/Oliv3rmoon/Nightshade" target="_blank" rel="noopener">Nightshade</a> is built on ProsperoEden; neither is affiliated with or endorsed by BlackBearReloaded, the Eden project, Sony or Nintendo. Starting statuses come from public reports in the <a href="https://github.com/Swordpdf/ProsperoEden/issues" target="_blank" rel="noopener">ProsperoEden issue tracker</a>; your results may differ.</p>
+    <p>Only play games you own, dumped from your own hardware. Never post game files, keys or firmware. <a href="https://github.com/Oliv3rmoon/eden-ps5-compat" target="_blank" rel="noopener">Source and results on GitHub</a> · <a href="https://discord.gg/pSqgRU3YP9" target="_blank" rel="noopener">Discord</a>.</p>
   </div>
 </footer>
 
@@ -496,7 +510,7 @@ footer p { margin: 0; max-width: 85ch; }
   });
   $("f-copy-btn").addEventListener("click", async () => {
     const r = readPost();
-    const text = [`Game: ${r.game}`, `Result: ${r.status ? S[r.status].label : "?"}`, `ProsperoEden version: ${r.app || "?"}`, `PS5 system software: ${r.fw || "?"} (${r.console})`, `Settings: ${r.settings || "defaults"}`, "", r.notes].join("\n").trim();
+    const text = [`Game: ${r.game}`, `Result: ${r.status ? S[r.status].label : "?"}`, `App version: ${r.app || "?"}`, `PS5 system software: ${r.fw || "?"} (${r.console})`, `Settings: ${r.settings || "defaults"}`, "", r.notes].join("\n").trim();
     const pre = $("f-copy"); pre.textContent = text; pre.hidden = false;
     try { await navigator.clipboard.writeText(text); $("f-msg").textContent = "Copied."; }
     catch (_) { const range = document.createRange(); range.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range); $("f-msg").textContent = "Selected. Copy it with your keyboard."; }
@@ -535,7 +549,7 @@ footer p { margin: 0; max-width: 85ch; }
           const labels = Array.isArray(i.labels) ? i.labels.map((l) => String((l && l.name) || "").toLowerCase()) : [];
           const game = (section(b, "Game") || String(i.title || "").replace(/^\[Compat\]\s*/i, "")).slice(0, 120).trim();
           if (!game) continue;
-          reports.push({ game, status: BY_LABEL[section(b, "How it runs").toLowerCase()] || "glitches", app: section(b, "ProsperoEden version").slice(0, 20),
+          reports.push({ game, status: BY_LABEL[section(b, "How it runs").toLowerCase()] || "glitches", app: (section(b, "App version") || section(b, "ProsperoEden version")).slice(0, 20),
             fw: section(b, "PS5 system software").slice(0, 12), console: section(b, "Console").slice(0, 20), settings: section(b, "Settings").slice(0, 120),
             notes: section(b, "What happened").slice(0, 600), at: Date.parse(i.created_at) || 0, url: String(i.html_url || ""),
             by: i.user && i.user.login ? String(i.user.login) : "", verified: labels.includes("verified") });
@@ -612,7 +626,7 @@ memory: largest free block 9584 MiB of 12416 MiB, heap 1920 MiB and 96 MiB in 1 
       tries: () => ["Lower the resolution and output resolution.", "Keep ASTC textures on the compressed setting.", "Turn off UltraCam and HD texture mods."], issues: [93, 151] },
     { hard: true, kind: "Crash cause", title: "The GPU read missing memory", test: (p) => p.has(/GPU_FAULT|Protection fault|Unmapped page access/i),
       say: () => "A GPU page fault. One cause, memory shrinking after relaunching a game, was fixed in 1.001.000.",
-      tries: (p) => [p.version && verCmp(p.version, "1.1.0") < 0 ? "Update ProsperoEden: your version predates that fix." : "Restart ProsperoEden before the game, and report it with logs if it repeats."], issues: [96] },
+      tries: (p) => [p.version && verCmp(p.version, "1.1.0") < 0 ? "Update to Nightshade: your version predates that fix." : "Restart the app before the game, and report it with logs if it repeats."], issues: [96] },
     { hard: true, kind: "Crash cause", title: "Invalid memory access", test: (p) => p.has(/SIGSEGV|invalid memory access/i),
       say: (p) => `The emulator touched an address it shouldn't${p.seconds !== null && p.seconds < 30 ? ", within seconds of starting" : ""}. Usually an emulator bug rather than your setup.`,
       tries: () => ["Try 1x and no mods to see if a setting triggers it.", "Report it with the logs from the same folder."], issues: [109] },
@@ -627,7 +641,7 @@ memory: largest free block 9584 MiB of 12416 MiB, heap 1920 MiB and 96 MiB in 1 
       say: (p) => `${p.res}x with ${[p.output === "2160p" && "4K output", p.hz === "120" && "120 Hz"].filter(Boolean).join(" and ")} eats shared memory and GPU time.`,
       tries: () => ["Start at 1x or 1.5x, 1080p or 1440p, 60 Hz, then raise one thing at a time."], issues: [99, 207] },
     { kind: "Likely factor", title: "Memory nearly full", test: (p) => p.freeMiB !== null && p.freeMiB < 1500,
-      say: (p) => `Only ${p.freeMiB} MiB was free in one block when it crashed.`, tries: () => ["Lower graphics settings and restart ProsperoEden between games."], issues: [] },
+      say: (p) => `Only ${p.freeMiB} MiB was free in one block when it crashed.`, tries: () => ["Lower graphics settings and restart the app between games."], issues: [] },
     { kind: "Note", title: "Older version", test: (p) => p.version && state.meta.latest && verCmp(p.version, state.meta.latest) < 0,
       say: (p) => `This report is from v${shortVer(p.version)}; the latest is v${shortVer(state.meta.latest)}. Several crashes were fixed in between.`,
       tries: () => ["Update from the menu, then try again."], issues: [] },
@@ -650,7 +664,7 @@ memory: largest free block 9584 MiB of 12416 MiB, heap 1920 MiB and 96 MiB in 1 
         el("p", {}, r.say(p)), el("ul", {}, r.tries(p).map((t) => el("li", {}, t))),
         r.issues.length ? el("p", { class: "mono", style: "font-size:0.82rem" }, "Related: ", r.issues.map((n, i) => [i ? ", " : "", el("a", { href: `${UPSTREAM}/issues/${n}`, target: "_blank", rel: "noopener" }, "#" + n)])) : null));
     } else {
-      box.append(el("div", { class: "finding" }, el("p", {}, isReport ? "None of the known patterns match. Post it with your result below so it can be added." : 'Crash reports start with "ProsperoEden crash report" and have lines like version:, reason: and running:.')));
+      box.append(el("div", { class: "finding" }, el("p", {}, isReport ? "None of the known patterns match. Post it with your result below so it can be added." : 'Crash reports (Nightshade\'s too) start with "ProsperoEden crash report" and have lines like version:, reason: and running:.')));
     }
     out.append(box);
     if (isReport) {

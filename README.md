@@ -1,6 +1,6 @@
-# Eden PS5 Compat Log
+# Nightshade Compat Log
 
-An unofficial, community-run log of how Nintendo Switch games run in [ProsperoEden](https://github.com/Swordpdf/ProsperoEden), the Eden emulator port for PS5, plus a crash report explainer.
+An unofficial, community-run log of how Nintendo Switch games run in [Nightshade](https://github.com/Oliv3rmoon/Nightshade) on PS5, plus a crash report explainer. Nightshade is Oliv3rmoon's release of [ProsperoEden](https://github.com/Swordpdf/ProsperoEden), the Eden emulator port for PS5, so results from either count.
 
 **Live page:** https://oliv3rmoon.github.io/eden-ps5-compat/
 
@@ -11,15 +11,15 @@ Use the **[Game result form](https://github.com/Oliv3rmoon/eden-ps5-compat/issue
 ## How the log decides a game's status
 
 - Every game is a list of results: the starting status from the public ProsperoEden issue reports, plus every result players post here.
-- The **newest ProsperoEden version** anyone tested decides. On that version, the status most results agree on wins; a tie goes to the most recent result.
+- The **newest app version** (Nightshade or ProsperoEden) anyone tested decides. On that version, the status most results agree on wins; a tie goes to the most recent result.
 - A game shows **▲ better** or **▼ worse** when its status changed from the version before.
 - A version tag with a **dashed border** means the game hasn't been tested on the latest version yet. The **Tested on latest** switch hides those.
 - **Settings that work** is the most common settings line among results that say it plays well or with glitches.
 
 ## Keeping the log up to date
 
-- **Daily import:** every day a GitHub Action reads new game reports and releases from the [ProsperoEden repository](https://github.com/Swordpdf/ProsperoEden/issues) and publishes the result straight to the page. It adds games that aren't in the log yet, adds new issue numbers to games that are, takes a game's status and version from a report only when it's on a newer app version, marks a game `closed` when all of its issues are closed, and moves **latest** to the newest ProsperoEden release. Each run's changes are in its commit message and in the run's summary on the **Actions** tab. Run it any time from there, or locally with `node scripts/import-reports.mjs` to see what it would change.
-- **Add or change a game:** edit [`data/games.json`](data/games.json) on GitHub, then commit. Each game has a `name`, an optional `titleId`, a `status` (`well`, `glitches`, `unplayable`, `wontstart`, `mods` or `closed`), the ProsperoEden `version` it was tested on, related upstream `issues`, and a `note`.
+- **Daily import:** every day a GitHub Action reads new game reports and releases from the [ProsperoEden repository](https://github.com/Swordpdf/ProsperoEden/issues) and publishes the result straight to the page. It adds games that aren't in the log yet, adds new issue numbers to games that are, takes a game's status and version from a report only when it's on a newer app version, marks a game `closed` when all of its issues are closed, and moves **latest** to the newest ProsperoEden or Nightshade release. Each run's changes are in its commit message and in the run's summary on the **Actions** tab. Run it any time from there, or locally with `node scripts/import-reports.mjs` to see what it would change.
+- **Add or change a game:** edit [`data/games.json`](data/games.json) on GitHub, then commit. Each game has a `name`, an optional `titleId`, a `status` (`well`, `glitches`, `unplayable`, `wontstart`, `mods` or `closed`), the app `version` it was tested on, related upstream `issues`, and a `note`.
 - **New app release:** the daily import moves `latest` to it; games not tested on it get the dashed tag.
 - **Trust a result:** add the `verified` label to its issue. Verified results count double.
 - **Remove spam or a wrong result:** close the issue. Only open issues are shown.
@@ -28,4 +28,4 @@ The page is a single `index.html` with no build step. GitHub Pages serves it fro
 
 ---
 
-Not affiliated with or endorsed by the ProsperoEden project, BlackBearReloaded, the Eden project, Sony or Nintendo. Only play games you own, dumped from your own hardware. Never post game files, keys or firmware.
+Not affiliated with or endorsed by BlackBearReloaded, the ProsperoEden project, the Eden project, Sony or Nintendo. Only play games you own, dumped from your own hardware. Never post game files, keys or firmware.
