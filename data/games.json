@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-31",
-  "latest": "1.012.001",
+  "updated": "2026-11-02",
+  "latest": "1.012.002",
   "statuses": "well | glitches | unplayable | wontstart | mods | closed",
   "games": [
     {
@@ -322,6 +322,15 @@
       "version": "1.005.101",
       "issues": [],
       "note": "Plays perfectly with its 1.2.1 update (a tester on Nightshade 1.005.101). Without the update (1.0.0) it hangs at Starting the game: put the update in updates/, or beside the game in roms/ from Nightshade 1.005.101."
+    },
+    {
+      "name": "040074A01BF12000",
+      "status": "wontstart",
+      "version": "",
+      "issues": [
+        308
+      ],
+      "note": "Donkey kong Bonanza."
     }
   ]
 }
